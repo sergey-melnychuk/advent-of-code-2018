@@ -75,19 +75,16 @@ fn process(codes: Vec<Code>, state: State) -> State {
     let mut at: usize = 0;
     let mut st = state;
 
-    //let mut it: usize = 0;
     while at < codes.len() {
         let op = codes.get(at).unwrap();
-        //println!("at={} op={:?} st={:?}", at, op, st);
+        println!("at={} op={:?} st={:?}", at, op, st);
         op.call(&mut st);
         let ip = st.ip;
         let to = st.inc(ip);
         at = to;
-
-        at += 1;
     }
-    //println!("it={} done", it);
 
+    println!("it={} done", at);
     st
 }
 
@@ -124,6 +121,7 @@ pub fn main() {
 
     let zero = State::make(ip, [0, 0, 0, 0, 0, 0]);
     let state = process(codes.clone(), zero);
+    // TODO detect infinite execution - then use register 0 to try to halt it
     println!("state: {:?}", state);
 }
 
@@ -154,6 +152,6 @@ mod tests {
 
         let zero = State::make(ip, [0, 0, 0, 0, 0, 0]);
         let state = process(codes, zero);
-        assert_eq!(state.get(0), 7);
+        assert_eq!(state.get(0), 6);
     }
 }
