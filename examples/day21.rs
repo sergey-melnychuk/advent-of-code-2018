@@ -84,7 +84,7 @@ fn process(codes: Vec<Code>, state: State) -> State {
         let to = st.inc(ip);
         at = to;
 
-        it += 1;
+        at += 1;
     }
     //println!("it={} done", it);
 
