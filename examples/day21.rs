@@ -1,5 +1,4 @@
-use std::io;
-use std::io::prelude::*;
+use std::{collections::HashSet, io::BufRead};
 
 /*
 
@@ -42,21 +41,14 @@ use std::io::prelude::*;
 
 */
 
-// 13522479 - ?
-// 15608036 - too high
-// 5234604 - nope
-// 1234860 - nope
-// 31 - nope
-
 pub fn main() {
     let input = get_input();
     let (ip, codes) = parse_codes(input);
-    println!("codes: {}", codes.len());
 
     let zero = State::new(ip, [0, 0, 0, 0, 0, 0]);
-    let state = process(&codes, zero);
-    println!("state: {:?}", state);
+    process(&codes, zero);
     // 13522479
+    // 14626276
 }
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone, Hash)]
@@ -127,11 +119,14 @@ impl Code {
 fn process(codes: &[Code], mut state: State) -> State {
     let mut at: usize = 0;
 
-    let mut min = usize::MAX;
+    let mut seen = HashSet::new();
+
+    let mut min1 = usize::MAX;
+    let mut last = usize::MAX;
     let mut n: usize = 0;
     while at < codes.len() {
         n += 1;
-        if n > 1000000 {
+        if n >= usize::MAX {
             break;
         }
 
@@ -140,10 +135,18 @@ fn process(codes: &[Code], mut state: State) -> State {
 
         if at == 28 {
             let r2 = state.get(2);
-            if r2 < min {
-                min = r2;
-                println!("eqrr: r[2] = {}, n = {}", state.get(2), n);
+
+            if min1 == usize::MAX {
+                min1 = r2;
+                println!("{}", min1);
+                //println!("eqrr: r[2] = {}, n = {}", state.get(2), n);
             }
+
+            if seen.contains(&r2) {
+                break;
+            }
+            seen.insert(r2);
+            last = r2;
         }
 
         op.call(&mut state);
@@ -152,12 +155,13 @@ fn process(codes: &[Code], mut state: State) -> State {
         at = to;
     }
 
-    println!("at={} done, min={}", at, min);
+    //println!("at={} done", at);
+    println!("{}", last);
     state
 }
 
 fn get_input() -> Vec<String> {
-    let stdin = io::stdin();
+    let stdin = std::io::stdin();
     let lines = stdin.lock().lines().into_iter()
         .map(Result::unwrap)
         .collect();
@@ -208,7 +212,7 @@ mod tests {
         ]);
 
         let zero = State::new(ip, [0, 0, 0, 0, 0, 0]);
-        let state = process(codes, zero);
+        let state = process(&codes, zero);
         assert_eq!(state.get(0), 6);
     }
 }
