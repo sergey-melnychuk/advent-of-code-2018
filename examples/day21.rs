@@ -1,14 +1,72 @@
 use std::io;
 use std::io::prelude::*;
 
-#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+/*
+
+#ip 4
+00: seti 123 0 2        # r[2] = 123;
+01: bani 2 456 2        # r[2] = r[2] & 456;
+02: eqri 2 72 2         # if r[2] == 72 { r[2] = 1; } else { r[2] = 0; }
+03: addr 2 4 4          # r[4] = r[2] + r[4]; // when r[2] == 1, jump over line 04
+04: seti 0 0 4          # // r[4] = 0; // executed only if r[2] was 0
+05: seti 0 0 2          # r[2] = 0;
+06: bori 2 65536 5      # r[5] = r[2] | 65536;
+07: seti 5234604 6 2    # r[2] = 5234604;
+
+08: bani 5 255 3        # r[3] = r[5] & 255;
+09: addr 2 3 2          # r[2] = r[2] + r[3];
+10: bani 2 16777215 2   # r[2] = r[2] & 16777215;
+11: muli 2 65899 2      # r[2] = r[2] * 65899;
+12: bani 2 16777215 2   # r[2] = r[2] & 16777215; // r[2] = 344955168996, r[5] = 65536,
+13: gtir 256 5 3        # if 256 > r[5] { r[3] = 1; } else { r[3] = 0; };
+14: addr 3 4 4          # r[4] = r[4] + r[3]; // r[3] = 0
+15: addi 4 1 4          # r[4] = r[4] + 1;
+16: seti 27 2 4         # // r[4] = 27; // jump to 28
+17: seti 0 0 3          # r[3] = 0;
+
+18: addi 3 1 1          # r[1] = r[3] + 1;
+19: muli 1 256 1        # r[1] = r[1] * 256;
+20: gtrr 1 5 1          # if r[1] > r[5] { r[1] = 1 } else { r[1] = 0 }
+21: addr 1 4 4          # r[4] = r[1] + r[4];
+22: addi 4 1 4          # r[4] = r[4] + 1;
+23: seti 25 6 4         # // r[4] = 25; // jump to line 26
+24: addi 3 1 3          # r[3] = r[3] + 1;
+25: seti 17 7 4         # r[4] = 14; // jump to line 18
+
+26: setr 3 4 5          # r[5] = r[3];
+27: seti 7 8 4          # r[4] = 7; // jump to line 8
+
+28: eqrr 2 0 3          # if r[2] == r[0] { r[3] = 1; } else { r[3] = 0; }
+29: addr 3 4 4          # r[4] = r[3] + r[4]; // halt: jump to 31
+30: seti 5 6 4          # r[5] = 5; // jump to line 6
+
+*/
+
+// 13522479 - ?
+// 15608036 - too high
+// 5234604 - nope
+// 1234860 - nope
+// 31 - nope
+
+pub fn main() {
+    let input = get_input();
+    let (ip, codes) = parse_codes(input);
+    println!("codes: {}", codes.len());
+
+    let zero = State::new(ip, [0, 0, 0, 0, 0, 0]);
+    let state = process(&codes, zero);
+    println!("state: {:?}", state);
+    // 13522479
+}
+
+#[derive(Debug, Eq, PartialEq, Copy, Clone, Hash)]
 struct State {
     ip: usize,
     rs: [usize; 6]
 }
 
 impl State {
-    fn make(ip: usize, rs: [usize; 6]) -> State {
+    fn new(ip: usize, rs: [usize; 6]) -> State {
         State { ip, rs }
     }
 
@@ -39,12 +97,8 @@ struct Code {
     c: usize,
 }
 
-trait Instruction {
-    fn call(&self, state: &mut State) -> bool;
-}
-
-impl Instruction for Code {
-    fn call(&self, state: &mut State) -> bool {
+impl Code {
+    fn call(&self, state: &mut State) {
         let (a, b, c) = (self.a, self.b, self.c);
         let s = state.clone();
         match self.op.as_ref() {
@@ -67,25 +121,39 @@ impl Instruction for Code {
             "eqir" => state.set(c, if a == s.get(b) {1} else {0}),
             _  => ()
         }
-        self.op != "#op"
     }
 }
 
-fn process(codes: Vec<Code>, state: State) -> State {
+fn process(codes: &[Code], mut state: State) -> State {
     let mut at: usize = 0;
-    let mut st = state;
 
+    let mut min = usize::MAX;
+    let mut n: usize = 0;
     while at < codes.len() {
-        let op = codes.get(at).unwrap();
-        println!("at={} op={:?} st={:?}", at, op, st);
-        op.call(&mut st);
-        let ip = st.ip;
-        let to = st.inc(ip);
+        n += 1;
+        if n > 1000000 {
+            break;
+        }
+
+        let op = &codes[at];
+        //println!("at={} op={:?} st={:?}", at, op, st);
+
+        if at == 28 {
+            let r2 = state.get(2);
+            if r2 < min {
+                min = r2;
+                println!("eqrr: r[2] = {}, n = {}", state.get(2), n);
+            }
+        }
+
+        op.call(&mut state);
+        let ip = state.ip;
+        let to = state.inc(ip);
         at = to;
     }
 
-    println!("it={} done", at);
-    st
+    println!("at={} done, min={}", at, min);
+    state
 }
 
 fn get_input() -> Vec<String> {
@@ -114,17 +182,6 @@ fn parse_codes(input: Vec<String>) -> (usize, Vec<Code>) {
     (ip, result)
 }
 
-pub fn main() {
-    let input = get_input();
-    let (ip, codes) = parse_codes(input);
-    println!("codes: {}", codes.len());
-
-    let zero = State::make(ip, [0, 0, 0, 0, 0, 0]);
-    let state = process(codes.clone(), zero);
-    // TODO detect infinite execution - then use register 0 to try to halt it
-    println!("state: {:?}", state);
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -150,7 +207,7 @@ mod tests {
             "seti 9 0 5",
         ]);
 
-        let zero = State::make(ip, [0, 0, 0, 0, 0, 0]);
+        let zero = State::new(ip, [0, 0, 0, 0, 0, 0]);
         let state = process(codes, zero);
         assert_eq!(state.get(0), 6);
     }
