@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
 use std::io;
 use std::io::prelude::*;
 
@@ -114,14 +114,11 @@ struct Cart {
 
 impl Cart {
     fn go(&self, cell: char) -> Option<Cart> {
-        match step(self.pos.x, self.pos.y, self.dir, cell, self.turn) {
-            Some(((x, y), d, t)) => Some(Cart {
+        step(self.pos.x, self.pos.y, self.dir, cell, self.turn).map(|((x, y), d, t)| Cart {
                 pos: Pos { x, y },
                 dir: d,
                 turn: t,
-            }),
-            None => None,
-        }
+            })
     }
 }
 

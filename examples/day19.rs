@@ -46,7 +46,7 @@ trait Instruction {
 impl Instruction for Code {
     fn call(&self, state: &mut State) -> bool {
         let (a, b, c) = (self.a, self.b, self.c);
-        let s = state.clone();
+        let s = *state;
         match self.op.as_ref() {
             "#ip" => state.ip(a),
             "addr" => state.set(c, s.get(a) + s.get(b)),
@@ -131,7 +131,7 @@ pub fn main() {
     //println!("codes: {}", codes.len());
 
     let zero = State::make(ip, [0, 0, 0, 0, 0, 0]);
-    let state = process(codes.clone(), zero);
+    let state = process(codes, zero);
     //println!("state: {:?}", state);
     println!("{}", state.rs[0]); // 1922
 

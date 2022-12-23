@@ -174,12 +174,10 @@ impl Grid {
                     }
                 }
 
-                if !seen.contains(&to) && k.is_none() {
-                    if cost_to > cost_at + 1 {
-                        dist[to.row][to.col] = cost_at + 1;
-                        from.insert(to, at);
-                        queue.push_back(to);
-                    }
+                if !seen.contains(&to) && k.is_none() && cost_to > cost_at + 1 {
+                    dist[to.row][to.col] = cost_at + 1;
+                    from.insert(to, at);
+                    queue.push_back(to);
                 }
             }
         }

@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::io;
 use std::io::prelude::*;
 
-use std::collections::HashMap;
+
 
 fn hash(value: [u8; 5]) -> usize {
     let mut result: usize = 0;
@@ -24,7 +24,7 @@ fn build_index(records: Vec<([u8; 5], u8)>) -> [u8; 32] {
 }
 
 fn parse_record(rec: &str) -> ([u8; 5], u8) {
-    let mut bits = [0 as u8; 5];
+    let mut bits = [0_u8; 5];
     let mut val = 0;
 
     let mut split = rec.split(" => ");
@@ -83,7 +83,7 @@ where
     let mut result = Vec::new();
     let mut expanded = vec![zero_elem.clone(); stride];
     expanded.extend(input);
-    expanded.extend(vec![zero_elem.clone(); stride]);
+    expanded.extend(vec![zero_elem; stride]);
 
     for start in 0..(expanded.len() - stride) {
         let mut acc = zero_acc.clone();
@@ -99,7 +99,7 @@ where
 fn window_5bit(input: Vec<u8>, size: usize) -> Vec<u8> {
     let stride = size - 1;
     let zero: u8 = 0;
-    let mask = ((1 as u8) << 5) - 1; // 0x1F = 00011111
+    let mask = (1_u8 << 5) - 1; // 0x1F = 00011111
     window(input, size, stride, zero, zero, |acc, e| {
         (acc << 1) & mask | e
     })
@@ -143,7 +143,7 @@ fn trim(items: Vec<u8>, offset: isize) -> (Vec<u8>, isize) {
     off += prefix_nonzero as isize;
     let mut trimmed = Vec::with_capacity(items.len());
     for i in prefix_nonzero..=suffix_nonzero {
-        trimmed.push(*items.get(i as usize).unwrap());
+        trimmed.push(*items.get(i).unwrap());
     }
     (trimmed, off)
 }
@@ -153,10 +153,10 @@ fn run(initial: Vec<u8>, window: usize, generations: usize, index: &[u8; 32]) ->
     let mut offset = 0;
 
     for i in 0..generations {
-        let (st, off) = generation(state.clone(), window, offset, &index);
+        let (st, off) = generation(state.clone(), window, offset, index);
         let (tr, cut) = trim(st, off);
         if tr == state {
-            let d = cut - offset;
+            let _d = cut - offset;
             println!(
                 "converged at: i={}, offset={}, cut={}, offset-cut={}",
                 i,
@@ -164,7 +164,7 @@ fn run(initial: Vec<u8>, window: usize, generations: usize, index: &[u8; 32]) ->
                 cut,
                 offset - cut
             );
-            offset = offset + (generations - i) as isize; // d=1 for the given input
+            offset += (generations - i) as isize; // d=1 for the given input
             break;
         } else {
             state = tr;
@@ -194,7 +194,7 @@ pub fn main() {
 
     {
         let generations = 50000000000;
-        let sum = run(initial.clone(), window, generations, &index);
+        let sum = run(initial, window, generations, &index);
         println!("{}", sum); // 2650000001362
     }
 }

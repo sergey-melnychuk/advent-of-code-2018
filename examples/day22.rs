@@ -10,7 +10,7 @@ struct Pos {
 // [x-1] * [y-1] (erosion levels)
 fn geo_index(grid: &Vec<Vec<u64>>, x: usize, y: usize) -> u64 {
     match (x, y) {
-        (0, 0) => 0 as u64,
+        (0, 0) => 0_u64,
         (x, 0) => (x as u64) * 16807,
         (0, y) => (y as u64) * 48271,
         _ => grid[y - 1][x] * grid[y][x - 1],
@@ -24,7 +24,7 @@ fn erosion_level(gi: u64, d: u64) -> u64 {
 }
 
 fn make_grid(width: usize, height: usize, depth: u64) -> Vec<Vec<u64>> {
-    let mut grid = vec![vec![0 as u64; width]; height];
+    let mut grid = vec![vec![0_u64; width]; height];
     for y in 0..height {
         for x in 0..width {
             let gi = geo_index(&grid, x, y);

@@ -237,7 +237,7 @@ fn get_input() -> String {
     let mut buffer = String::new();
     let stdin = io::stdin();
     let mut handle = stdin.lock();
-    let n = handle.read_to_string(&mut buffer).unwrap();
+    let _n = handle.read_to_string(&mut buffer).unwrap();
     //println!("n: {}\n{}", n, buffer);
     buffer
 }
@@ -306,9 +306,7 @@ fn part1(recs: &Vec<Record>) -> usize {
 fn fitness(recs: &Vec<Record>) -> HashMap<usize, HashSet<usize>> {
     let mut map = HashMap::new();
     for rec in recs {
-        if !map.contains_key(&rec.code.op) {
-            map.insert(rec.code.op, HashSet::new());
-        }
+        map.entry(rec.code.op).or_insert_with(HashSet::new);
         for op in nfits(rec) {
             map.get_mut(&rec.code.op).unwrap().insert(op);
         }
@@ -320,7 +318,7 @@ fn fitness(recs: &Vec<Record>) -> HashMap<usize, HashSet<usize>> {
 fn reduce(mut fit: HashMap<usize, HashSet<usize>>) -> [usize; 16] {
     let mut mapping = [0; 16];
 
-    while fit.len() > 0 {
+    while !fit.is_empty() {
         //        println!();
         //        for (k, v) in fit.iter() {
         //            println!("{} -> {:?}", k, v);

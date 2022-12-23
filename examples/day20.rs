@@ -434,7 +434,7 @@ fn print_tree(root: &Node) -> Vec<String> {
 
 fn print_node(node: &Node, lvl: usize, acc: &mut Vec<String>) {
     let mut s = String::new();
-    for i in 0..lvl {
+    for _i in 0..lvl {
         s.push(' ');
     }
     if node.is_leaf() {

@@ -14,7 +14,7 @@ fn get_input(line: &str) -> Input {
     let mut marble: usize = 0;
 
     let re = Regex::new(r"(\d+) players; last marble is worth (\d+) points").unwrap();
-    for cap in re.captures_iter(&line) {
+    for cap in re.captures_iter(line) {
         players = cap[1].parse().unwrap();
         marble = cap[2].parse().unwrap();
     }
@@ -47,7 +47,7 @@ fn play(input: &Input) -> Vec<usize> {
     list.insert(0, 0);
 
     let mut player: usize; // Number of current player (1-based)
-    let mut current: usize = 0; // Index of current marble (0-based) in marbles vector
+    let _current: usize = 0; // Index of current marble (0-based) in marbles vector
 
     for m in 1..=input.marble {
         player = (m - 1) % input.players;
@@ -129,11 +129,11 @@ impl DLList {
                 if node == 0 {
                     if offset > 0 {
                         // Next after last node is addressed, rewind to head
-                        node = *self.forward.get(0).unwrap();
+                        node = *self.forward.first().unwrap();
                     } else {
                         //TODO FIXME
                         // Prev to the head node is addressed, rewind to tail
-                        node = *self.reverse.get(0).unwrap();
+                        node = *self.reverse.first().unwrap();
                     }
                 }
                 steps -= 1;
@@ -166,7 +166,7 @@ impl DLList {
         self.current = this;
 
         // Set 'head' if empty
-        if *self.forward.get(0).unwrap() == 0 {
+        if *self.forward.first().unwrap() == 0 {
             *self.forward.get_mut(0).unwrap() = this;
         }
 
@@ -198,7 +198,7 @@ impl DLList {
     where
         F: Fn(ACC, usize) -> ACC,
     {
-        let head: usize = *self.forward.get(0).unwrap();
+        let head: usize = *self.forward.first().unwrap();
         //println!("reduce: head={}", head);
 
         let mut next = head;
@@ -230,7 +230,7 @@ fn main() {
 
     // This is the whole input for the task
     let line = "426 players; last marble is worth 72058 points";
-    let input = get_input(&line);
+    let input = get_input(line);
     println!("{:?}", input);
 
     let scores = play(&input);

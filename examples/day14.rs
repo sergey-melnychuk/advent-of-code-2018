@@ -102,14 +102,14 @@ pub fn main() {
     let count: usize = 030121; // input
     let query: usize = 10; // 10 recepies after 'count' of recepies is available
 
-    let mut state: Vec<usize> = vec![3, 7];
+    let state: Vec<usize> = vec![3, 7];
 
     {
         let result = answer(state.clone(), count, query);
         println!("{:?}", result); // 5101271252
     }
     {
-        let result = reverse(state.clone(), vec![0, 3, 0, 1, 2, 1]);
+        let result = reverse(state, vec![0, 3, 0, 1, 2, 1]);
         println!("{}", result); // 20287556
     }
 }

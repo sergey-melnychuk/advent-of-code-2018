@@ -53,13 +53,13 @@ impl Size {
 // }
 
 fn parse_line(line: &str) -> (i64, i64, i64, i64) {
-    let mut s0 = line.split("<");
+    let mut s0 = line.split('<');
     s0.next();
-    let mut s1 = s0.next().unwrap().split(">").next().unwrap().split(",");
+    let mut s1 = s0.next().unwrap().split('>').next().unwrap().split(',');
     let x1: i64 = s1.next().unwrap().trim().parse().unwrap();
     let y1: i64 = s1.next().unwrap().trim().parse().unwrap();
 
-    let mut s2 = s0.next().unwrap().split(">").next().unwrap().split(",");
+    let mut s2 = s0.next().unwrap().split('>').next().unwrap().split(',');
     let x2: i64 = s2.next().unwrap().trim().parse().unwrap();
     let y2: i64 = s2.next().unwrap().trim().parse().unwrap();
 
@@ -74,7 +74,7 @@ fn fetch_input() -> Vec<Star> {
         if row.is_empty() {
             break;
         }
-        let (px, py, vx, vy) = parse_line(&row);
+        let (px, py, vx, vy) = parse_line(row);
         result.push(Star {
             pos: V2 { x: px, y: py },
             vel: V2 { x: vx, y: vy },

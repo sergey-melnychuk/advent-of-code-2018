@@ -57,7 +57,7 @@ fn parse_rec(line: &str, regex: &Regex) -> Option<Rec> {
         };
         return Some(rec);
     }
-    return None;
+    None
 }
 
 fn find_strongest(recs: &Vec<Rec>) -> usize {
@@ -75,7 +75,7 @@ fn find_strongest(recs: &Vec<Rec>) -> usize {
 fn find_in_range(idx: usize, recs: &Vec<Rec>) -> usize {
     let mut count = 0;
     let strongest = &recs[idx];
-    for (i, rec) in recs.iter().enumerate() {
+    for (_i, rec) in recs.iter().enumerate() {
         if strongest.in_range(&rec.pos) {
             count += 1;
         }

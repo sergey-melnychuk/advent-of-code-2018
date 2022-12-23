@@ -47,7 +47,7 @@ impl Grid {
     }
 
     fn dump(&self) -> Vec<String> {
-        let mut chars = self.chars.clone();
+        let chars = self.chars.clone();
         chars.into_iter().map(|cs| cs.iter().collect()).collect()
     }
 
@@ -108,7 +108,7 @@ fn get_input() -> String {
     let mut buffer = String::new();
     let stdin = io::stdin();
     let mut handle = stdin.lock();
-    let n = handle.read_to_string(&mut buffer).unwrap();
+    let _n = handle.read_to_string(&mut buffer).unwrap();
     //println!("n: {}\n{}", n, buffer);
     buffer
 }
@@ -259,7 +259,7 @@ fn get_sources(pos: &Pos, l: usize, r: usize, grid: &Grid) -> Vec<Pos> {
 fn pour(from: &Pos, grid: &mut Grid) -> Vec<Pos> {
     let mut result = Vec::new();
 
-    let opt = get_lbound(&from, grid);
+    let opt = get_lbound(from, grid);
     if opt.is_some() {
         let p = opt.unwrap();
         let (l, r, c) = get_hbounds(&p, grid);

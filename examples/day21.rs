@@ -92,7 +92,7 @@ struct Code {
 impl Code {
     fn call(&self, state: &mut State) {
         let (a, b, c) = (self.a, self.b, self.c);
-        let s = state.clone();
+        let s = *state;
         match self.op.as_ref() {
             "#ip" => state.ip(a),
             "addr" => state.set(c, s.get(a) + s.get(b)),

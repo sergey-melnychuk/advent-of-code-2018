@@ -19,7 +19,7 @@ impl Grid {
     }
 
     fn dump(&self) -> Vec<String> {
-        let mut chars = self.chars.clone();
+        let chars = self.chars.clone();
         chars.into_iter().map(|cs| cs.iter().collect()).collect()
     }
 
@@ -101,10 +101,10 @@ fn count(grid: &Grid, x: usize, y: usize) -> (usize, usize, usize) {
 fn mutate(grid: &Grid, x: usize, y: usize) -> char {
     let c = grid.get(x, y);
     match (c, count(grid, x, y)) {
-        ('.', (gr, tr, ly)) if tr >= 3 => '|',
-        ('|', (gr, tr, ly)) if ly >= 3 => '#',
-        ('#', (gr, tr, ly)) if ly >= 1 && tr >= 1 => '#',
-        ('#', (gr, tr, ly)) => '.',
+        ('.', (_gr, tr, _ly)) if tr >= 3 => '|',
+        ('|', (_gr, _tr, ly)) if ly >= 3 => '#',
+        ('#', (_gr, tr, ly)) if ly >= 1 && tr >= 1 => '#',
+        ('#', (_gr, _tr, _ly)) => '.',
         _ => c,
     }
 }
@@ -113,7 +113,7 @@ fn simulate(this: Grid) -> Grid {
     let mut next = this.clone();
     for y in 0..this.rows {
         for x in 0..this.cols {
-            let c = this.get(x, y);
+            let _c = this.get(x, y);
             let m = mutate(&this, x, y);
             next.set(x, y, m);
         }
@@ -125,7 +125,7 @@ fn iterate(this: Grid, k: usize) -> Grid {
     let mut seen: HashMap<Grid, usize> = HashMap::new();
     seen.insert(this.clone(), 0);
 
-    let mut next = this.clone();
+    let mut next = this;
     let mut i = 0;
     while i < k {
         //println!("iteration: {}", i);
@@ -174,7 +174,7 @@ pub fn main() {
     }
 
     let k = 1000000000;
-    let last = iterate(grid.clone(), k);
+    let last = iterate(grid, k);
     {
         let tr = last.count(|c| c == '|');
         let ly = last.count(|c| c == '#');

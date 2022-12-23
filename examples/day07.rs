@@ -116,7 +116,7 @@ impl GraphTools {
         }
 
         for node in roots {
-            if perm.contains(&node) {
+            if perm.contains(node) {
                 continue;
             }
             visit(*node, &mut temp, &mut perm, graph, &mut ordered);
@@ -155,8 +155,8 @@ fn main() {
 
     let raw: Vec<(char, char)> = get_input().iter().map(|x| parse_line(x)).collect();
 
-    let input: Vec<(usize, usize)> = (&raw)
-        .into_iter()
+    let input: Vec<(usize, usize)> = raw
+        .iter()
         .map(|pair| {
             (
                 pair.0 as usize - 'A' as usize,
@@ -181,7 +181,7 @@ fn main() {
     for i in 0..graph.n {
         println!(
             "{} in={} out={}",
-            (i as u8 + 'A' as u8) as char,
+            (i as u8 + b'A') as char,
             graph.target(i).len(),
             graph.source(i).len()
         );
@@ -202,7 +202,7 @@ fn main() {
 
     GraphTools::sort(&mut graph);
     let dag = GraphTools::topological(&graph, &roots);
-    let chars: Vec<char> = dag.iter().map(|x| (*x as u8 + 'A' as u8) as char).collect();
+    let chars: Vec<char> = dag.iter().map(|x| (*x as u8 + b'A') as char).collect();
     println!("{:?}", chars);
 
     // node -> [nodes waiting for the key]
@@ -234,7 +234,7 @@ fn main() {
     }
     while !queue.is_empty() {
         let step = *queue.iter().next().unwrap();
-        let chr = (step as u8 + 'A' as u8) as char;
+        let chr = (step as u8 + b'A') as char;
         queue.remove(&step);
         println!(
             "step={} queue={:?} blocked={}",
@@ -261,14 +261,14 @@ fn main() {
 
     println!("{:?}", ordered);
     for step in ordered {
-        print!("{}", (step as u8 + 'A' as u8) as char);
+        print!("{}", (step as u8 + b'A') as char);
     }
     println!();
 
     // part 2
 
     fn time(c: char) -> usize {
-        (c as u8 - 'A' as u8) as usize + 61
+        (c as u8 - b'A') as usize + 61
     }
 
     let mut active: HashMap<char, usize> = HashMap::new();
@@ -292,7 +292,7 @@ fn main() {
 
     let mut ready: HashSet<char> = HashSet::new();
     for r in &roots {
-        ready.insert((*r as u8 + 'A' as u8) as char);
+        ready.insert((*r as u8 + b'A') as char);
     }
 
     while !ready.is_empty() || !active.is_empty() {

@@ -11,7 +11,7 @@ fn get_input() -> Vec<usize> {
     let n = stdin.lock().read_line(&mut line).unwrap();
     println!("input bytes: {}", n);
     let mut result: Vec<usize> = Vec::new();
-    for item in line.split_whitespace().into_iter() {
+    for item in line.split_whitespace() {
         result.push(item.parse().unwrap())
     }
     result
