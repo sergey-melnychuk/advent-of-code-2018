@@ -6,7 +6,7 @@ use regex::Regex;
 #[derive(Debug, Eq, PartialEq)]
 struct Input {
     players: usize,
-    marble: usize
+    marble: usize,
 }
 
 fn get_input(line: &str) -> Input {
@@ -41,36 +41,35 @@ fn seek(marbles: &Vec<usize>, current: usize, offset: i64) -> usize {
 fn play(input: &Input) -> Vec<usize> {
     let mut scores = vec![0; input.players];
 
-//    let mut marbles: Vec<usize> = Vec::with_capacity(input.marble + 1);
-//    marbles.push(0); // Initial marble
+    //    let mut marbles: Vec<usize> = Vec::with_capacity(input.marble + 1);
+    //    marbles.push(0); // Initial marble
     let mut list = DLList::new(input.marble + 1);
     list.insert(0, 0);
 
-    let mut player: usize;  // Number of current player (1-based)
+    let mut player: usize; // Number of current player (1-based)
     let mut current: usize = 0; // Index of current marble (0-based) in marbles vector
 
     for m in 1..=input.marble {
         player = (m - 1) % input.players;
 
         if m % 23 == 0 {
-//            let index = seek(&marbles, current, -7);
-//            let points0 = marbles.remove(index);
-//            current = index;
+            //            let index = seek(&marbles, current, -7);
+            //            let points0 = marbles.remove(index);
+            //            current = index;
             let points = list.remove(-7);
             *scores.get_mut(player).unwrap() += points + m;
         } else {
-//            let index = seek(&marbles, current, 2);
-//            marbles.insert(index, m);
-//            current = index;
+            //            let index = seek(&marbles, current, 2);
+            //            marbles.insert(index, m);
+            //            current = index;
             list.insert(1, m);
         }
 
-
-//        let dbg = list.vec();
-//        println!("\nm:{} eq={}", m, marbles == dbg);
-//        println!("current: {}", current);
-//        println!("r:{:?}", marbles);
-//        println!("w:{:?}", dbg);
+        //        let dbg = list.vec();
+        //        println!("\nm:{} eq={}", m, marbles == dbg);
+        //        println!("current: {}", current);
+        //        println!("r:{:?}", marbles);
+        //        println!("w:{:?}", dbg);
     }
     scores
 }
@@ -97,12 +96,13 @@ struct DLList {
 
 impl DLList {
     fn new(cap: usize) -> DLList {
-        DLList { cap,
+        DLList {
+            cap,
             index: 0,
             current: 0,
             data: vec![0; cap + 1],
             forward: vec![0; cap + 1],
-            reverse: vec![0; cap + 1]
+            reverse: vec![0; cap + 1],
         }
     }
 
@@ -147,13 +147,13 @@ impl DLList {
         let this = self.index;
         *self.data.get_mut(this).unwrap() = value;
 
-//        println!("\ninsert: value={} this={}", value, this);
+        //        println!("\ninsert: value={} this={}", value, this);
 
         let prev: usize = self.slide(offset);
         let next: usize = *self.forward.get(prev).unwrap();
 
-//        println!("prev: {:?}", prev);
-//        println!("next: {:?}", next);
+        //        println!("prev: {:?}", prev);
+        //        println!("next: {:?}", next);
 
         *self.forward.get_mut(this).unwrap() = next;
         *self.reverse.get_mut(this).unwrap() = prev;
@@ -175,9 +175,9 @@ impl DLList {
             *self.reverse.get_mut(0).unwrap() = this;
         }
 
-//        println!("fw: {:?}", self.forward);
-//        println!("rv: {:?}", self.reverse);
-//        println!("data: {:?}", self.data);
+        //        println!("fw: {:?}", self.forward);
+        //        println!("rv: {:?}", self.reverse);
+        //        println!("data: {:?}", self.data);
     }
 
     fn remove(&mut self, offset: i64) -> usize {
@@ -195,7 +195,9 @@ impl DLList {
     }
 
     fn reduce<F, ACC>(&self, zero: ACC, f: F) -> ACC
-        where F: Fn(ACC, usize) -> ACC {
+    where
+        F: Fn(ACC, usize) -> ACC,
+    {
         let head: usize = *self.forward.get(0).unwrap();
         //println!("reduce: head={}", head);
 
@@ -213,15 +215,18 @@ impl DLList {
 
     fn vec(&self) -> Vec<usize> {
         let mut vec: Vec<usize> = Vec::with_capacity(self.cap);
-        self.reduce(&mut vec, |acc: &mut Vec<usize>, x: usize| { acc.push(x); acc });
+        self.reduce(&mut vec, |acc: &mut Vec<usize>, x: usize| {
+            acc.push(x);
+            acc
+        });
         vec
     }
 }
 
 fn main() {
-//    let mut line = String::new();
-//    let n_bytes = io::stdin().read_line(&mut line).unwrap();
-//    println!("input: {} bytes", n_bytes);
+    //    let mut line = String::new();
+    //    let n_bytes = io::stdin().read_line(&mut line).unwrap();
+    //    println!("input: {} bytes", n_bytes);
 
     // This is the whole input for the task
     let line = "426 players; last marble is worth 72058 points";
@@ -232,7 +237,10 @@ fn main() {
     let score = max(&scores);
     println!("max: {}", score); // max: 424112
 
-    let new_input = Input { marble: input.marble * 100, ..input };
+    let new_input = Input {
+        marble: input.marble * 100,
+        ..input
+    };
     println!("{:?}", new_input);
     let new_score = max(&play(&new_input));
     println!("max: {}", new_score);
@@ -267,19 +275,36 @@ mod list {
             vec![0, 8, 4, 9, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15],
             vec![0, 16, 8, 4, 9, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15],
             vec![0, 16, 8, 17, 4, 9, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 9, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 9, 19, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 9, 19, 2, 20, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 9, 19, 2, 20, 10, 21, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 9, 19, 2, 20, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 19, 2, 20, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 19, 2, 24, 20, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15],
-            vec![0, 16, 8, 17, 4, 18, 19, 2, 24, 20, 25, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15],
+            vec![
+                0, 16, 8, 17, 4, 18, 9, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15,
+            ],
+            vec![
+                0, 16, 8, 17, 4, 18, 9, 19, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15,
+            ],
+            vec![
+                0, 16, 8, 17, 4, 18, 9, 19, 2, 20, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15,
+            ],
+            vec![
+                0, 16, 8, 17, 4, 18, 9, 19, 2, 20, 10, 21, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15,
+            ],
+            vec![
+                0, 16, 8, 17, 4, 18, 9, 19, 2, 20, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15,
+            ],
+            vec![
+                0, 16, 8, 17, 4, 18, 19, 2, 20, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15,
+            ],
+            vec![
+                0, 16, 8, 17, 4, 18, 19, 2, 24, 20, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15,
+            ],
+            vec![
+                0, 16, 8, 17, 4, 18, 19, 2, 24, 20, 25, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7,
+                15,
+            ],
         ];
 
         assert_eq!(list.vec(), *state.get(0).unwrap());
 
-        for m in 1..=(state.len()-1) {
+        for m in 1..=(state.len() - 1) {
             println!("m={}", m);
             if m % 23 == 0 {
                 assert_eq!(list.remove(-7), 9);
@@ -362,7 +387,7 @@ mod list {
         }
 
         let sum = list.reduce(0, |acc: usize, val: usize| acc + val);
-        assert_eq!(sum, n - (n-100)/10+1);
+        assert_eq!(sum, n - (n - 100) / 10 + 1);
     }
 
     #[test]
@@ -408,22 +433,20 @@ mod list {
         assert_eq!(list.vec(), vec![1, 2, 100, 3, 4, 6, 7, 8, 9]);
     }
 
-
-//    #[test]
-//    fn insert_1k() {
-//        assert_size(1000);
-//    }
-//
-//    #[test]
-//    fn insert_100k() {
-//        assert_size(100000);
-//    }
-//
-//    #[test]
-//    fn insert_10m() {
-//        assert_size(10000000);
-//    }
-
+    //    #[test]
+    //    fn insert_1k() {
+    //        assert_size(1000);
+    //    }
+    //
+    //    #[test]
+    //    fn insert_100k() {
+    //        assert_size(100000);
+    //    }
+    //
+    //    #[test]
+    //    fn insert_10m() {
+    //        assert_size(10000000);
+    //    }
 }
 
 #[cfg(test)]
@@ -433,96 +456,137 @@ mod test {
     #[test]
     fn test_input() {
         let line = "426 players; last marble is worth 72058 points";
-        let input = Input { players: 426, marble: 72058 };
+        let input = Input {
+            players: 426,
+            marble: 72058,
+        };
         assert_eq!(get_input(line), input);
     }
 
     #[test]
     fn test_play_example() {
         assert_eq!(
-            play(&Input { players: 9, marble: 25 }),
+            play(&Input {
+                players: 9,
+                marble: 25
+            }),
             vec![0, 0, 0, 0, 32, 0, 0, 0, 0,]
         )
     }
 
     #[test]
     fn test_play_10() {
-        assert_eq!(max(&play(&Input { players: 10, marble: 1618 })), 8317);
+        assert_eq!(
+            max(&play(&Input {
+                players: 10,
+                marble: 1618
+            })),
+            8317
+        );
     }
 
     #[test]
     fn test_play_13() {
-        assert_eq!(max(&play(&Input { players: 13, marble: 7999 })), 146373);
+        assert_eq!(
+            max(&play(&Input {
+                players: 13,
+                marble: 7999
+            })),
+            146373
+        );
     }
 
     #[test]
     fn test_play_17() {
-        assert_eq!(max(&play(&Input { players: 17, marble: 1104 })), 2764);
+        assert_eq!(
+            max(&play(&Input {
+                players: 17,
+                marble: 1104
+            })),
+            2764
+        );
     }
 
     #[test]
     fn test_play_21() {
-        assert_eq!(max(&play(&Input { players: 21, marble: 6111 })), 54718);
+        assert_eq!(
+            max(&play(&Input {
+                players: 21,
+                marble: 6111
+            })),
+            54718
+        );
     }
 
     #[test]
     fn test_play_30() {
-        assert_eq!(max(&play(&Input { players: 30, marble: 5807 })), 37305);
+        assert_eq!(
+            max(&play(&Input {
+                players: 30,
+                marble: 5807
+            })),
+            37305
+        );
     }
 
     #[test]
     fn test_part1() {
-        assert_eq!(max(&play(&Input { players: 426, marble: 72058 })), 424112);
+        assert_eq!(
+            max(&play(&Input {
+                players: 426,
+                marble: 72058
+            })),
+            424112
+        );
     }
 
     //    #[test]
-//    fn test_seek_clockwise_0() {
-//        assert_eq!(seek(&vec![],0, 2), 0);
-//    }
-//
-//    #[test]
-//    fn test_seek_clockwise_1() {
-//        assert_eq!(seek(&vec![0],0, 2), 1);
-//    }
-//
-//    #[test]
-//    fn test_seek_clockwise_2() {
-//        assert_eq!(seek(&vec![0, 1],1, 2), 1);
-//    }
-//
-//    #[test]
-//    fn test_seek_clockwise_3() {
-//        assert_eq!(seek(&vec![0, 2, 1],1, 2), 3);
-//    }
-//
-//    #[test]
-//    fn test_seek_clockwise_4() {
-//        assert_eq!(seek(&vec![0, 2, 1, 3],3, 2), 1);
-//    }
-//
-//    #[test]
-//    fn test_seek_clockwise_5() {
-//        assert_eq!(seek(&vec![0, 4, 2, 1, 3],1, 2), 3);
-//    }
-//
-//    #[test]
-//    fn test_seek_clockwise_6() {
-//        assert_eq!(seek(&vec![0, 4, 2, 5, 1, 3],3, 2), 5);
-//    }
-//
-//    #[test]
-//    fn test_seek_clockwise_7() {
-//        assert_eq!(seek(&vec![0, 4, 2, 5, 1, 6, 3],5, 2), 7);
-//    }
-//
-//    #[test]
-//    fn test_seek_counter_clockwise22() {
-//        assert_eq!(
-//            seek(&vec![
-//                0, 16,  8, 17,  4, 18,  9, 19,  2, 20, 10, 21,  5, 22, 11,  1, 12,  6, 13,  3, 14,  7, 15,
-//            ], 13, -7),
-//            6
-//        )
-//    }
-
+    //    fn test_seek_clockwise_0() {
+    //        assert_eq!(seek(&vec![],0, 2), 0);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_clockwise_1() {
+    //        assert_eq!(seek(&vec![0],0, 2), 1);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_clockwise_2() {
+    //        assert_eq!(seek(&vec![0, 1],1, 2), 1);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_clockwise_3() {
+    //        assert_eq!(seek(&vec![0, 2, 1],1, 2), 3);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_clockwise_4() {
+    //        assert_eq!(seek(&vec![0, 2, 1, 3],3, 2), 1);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_clockwise_5() {
+    //        assert_eq!(seek(&vec![0, 4, 2, 1, 3],1, 2), 3);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_clockwise_6() {
+    //        assert_eq!(seek(&vec![0, 4, 2, 5, 1, 3],3, 2), 5);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_clockwise_7() {
+    //        assert_eq!(seek(&vec![0, 4, 2, 5, 1, 6, 3],5, 2), 7);
+    //    }
+    //
+    //    #[test]
+    //    fn test_seek_counter_clockwise22() {
+    //        assert_eq!(
+    //            seek(&vec![
+    //                0, 16,  8, 17,  4, 18,  9, 19,  2, 20, 10, 21,  5, 22, 11,  1, 12,  6, 13,  3, 14,  7, 15,
+    //            ], 13, -7),
+    //            6
+    //        )
+    //    }
 }

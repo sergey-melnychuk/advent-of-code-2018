@@ -13,7 +13,7 @@ fn geo_index(grid: &Vec<Vec<u64>>, x: usize, y: usize) -> u64 {
         (0, 0) => 0 as u64,
         (x, 0) => (x as u64) * 16807,
         (0, y) => (y as u64) * 48271,
-        _ => grid[y-1][x] * grid[y][x-1]
+        _ => grid[y - 1][x] * grid[y][x - 1],
     }
 }
 

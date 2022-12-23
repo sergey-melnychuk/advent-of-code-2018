@@ -1,4 +1,3 @@
-
 fn fuel(x: i64, y: i64, nr: i64) -> i64 {
     let rack = x + 10;
     let power = rack * y;
@@ -10,8 +9,8 @@ fn fuel(x: i64, y: i64, nr: i64) -> i64 {
 
 fn conv(x: usize, y: usize, size: usize, mat: &Vec<Vec<i64>>) -> i64 {
     let mut sum = 0;
-    for i in x..(x+size) {
-        for j in y..(y+size) {
+    for i in x..(x + size) {
+        for j in y..(y + size) {
             sum += mat.get(i).unwrap().get(j).unwrap();
         }
     }
@@ -39,8 +38,7 @@ fn transpose(mat: &Vec<Vec<i64>>) -> Vec<Vec<i64>> {
     let mut result = vec![vec![0; rows]; cols];
     for i in 0..cols {
         for j in 0..rows {
-            *result.get_mut(i).unwrap().get_mut(j).unwrap() =
-                *mat.get(j).unwrap().get(i).unwrap();
+            *result.get_mut(i).unwrap().get_mut(j).unwrap() = *mat.get(j).unwrap().get(i).unwrap();
         }
     }
     result
@@ -71,14 +69,14 @@ fn main() {
     for i in 0..len {
         for j in 0..len {
             *cells.get_mut(i).unwrap().get_mut(j).unwrap() =
-                fuel((i+1) as i64, (j+1) as i64, nr);
+                fuel((i + 1) as i64, (j + 1) as i64, nr);
         }
     }
 
     let (mut maxx, mut maxy) = (0, 0);
     let mut max = std::i64::MIN;
-    for i in 0..(len-3) {
-        for j in 0..(len-3) {
+    for i in 0..(len - 3) {
+        for j in 0..(len - 3) {
             let c = conv(i, j, 3, &cells);
             if c > max {
                 max = c;
@@ -123,43 +121,30 @@ mod test {
 
     #[test]
     fn test_window() {
-        assert_eq!(window(&vec![1, 1, 1, 1, 1, 1, 1, 1, 1], 3),
-                   vec![3, 3, 3, 3, 3, 3, 3]);
+        assert_eq!(
+            window(&vec![1, 1, 1, 1, 1, 1, 1, 1, 1], 3),
+            vec![3, 3, 3, 3, 3, 3, 3]
+        );
 
-        assert_eq!(window(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9], 3),
-                   vec![6, 9, 12, 15, 18, 21, 24]);
+        assert_eq!(
+            window(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9], 3),
+            vec![6, 9, 12, 15, 18, 21, 24]
+        );
 
-        assert_eq!(window(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9], 9),
-                   vec![45]);
+        assert_eq!(window(&vec![1, 2, 3, 4, 5, 6, 7, 8, 9], 9), vec![45]);
     }
 
     #[test]
     fn test_transpose_3x3() {
-        let mat = vec![
-            vec![1, 2, 3],
-            vec![1, 2, 3],
-            vec![1, 2, 3],
-        ];
-        let exp = vec![
-            vec![1, 1, 1],
-            vec![2, 2, 2],
-            vec![3, 3, 3],
-        ];
+        let mat = vec![vec![1, 2, 3], vec![1, 2, 3], vec![1, 2, 3]];
+        let exp = vec![vec![1, 1, 1], vec![2, 2, 2], vec![3, 3, 3]];
         assert_eq!(transpose(&mat), exp);
     }
 
     #[test]
     fn test_transpose_2x4() {
-        let mat = vec![
-            vec![1, 2, 3, 4],
-            vec![5, 6, 7, 8]
-        ];
-        let exp = vec![
-            vec![1, 5],
-            vec![2, 6],
-            vec![3, 7],
-            vec![4, 8]
-        ];
+        let mat = vec![vec![1, 2, 3, 4], vec![5, 6, 7, 8]];
+        let exp = vec![vec![1, 5], vec![2, 6], vec![3, 7], vec![4, 8]];
         assert_eq!(transpose(&mat), exp);
     }
 }

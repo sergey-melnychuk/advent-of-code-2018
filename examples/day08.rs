@@ -23,7 +23,7 @@ struct Node {
     n_children: usize, // number of child nodes
     n_metadata: usize, // number of metadata entries
     metadata: Vec<usize>,
-    children: Vec<usize>
+    children: Vec<usize>,
 }
 
 impl Node {
@@ -51,7 +51,13 @@ impl Node {
 fn fetch_node(id: usize, offset: usize, stream: &Vec<usize>) -> (Node, usize) {
     let n_children = *stream.get(offset).unwrap();
     let n_metadata = *stream.get(offset + 1).unwrap();
-    let mut node = Node {id, n_children, n_metadata, metadata: Vec::new(), children: Vec::new()};
+    let mut node = Node {
+        id,
+        n_children,
+        n_metadata,
+        metadata: Vec::new(),
+        children: Vec::new(),
+    };
     let mut next = offset + 2;
     if n_children == 0 {
         next = fetch_metadata(&mut node, next, stream);
@@ -86,7 +92,7 @@ fn fetch_all(stream: &Vec<usize>) -> Vec<Node> {
             let parent: &mut Node = tree.get_mut(*stack.last().unwrap()).unwrap();
             offset = fetch_metadata(parent, offset, stream);
             stack.pop();
-            continue
+            continue;
         }
 
         let id = tree.len();
@@ -159,16 +165,34 @@ mod tests {
     #[test]
     fn test_leaf_node() {
         let input: Vec<usize> = vec![0, 3, 1, 2, 3];
-        let node = Node { id: 0, n_children: 0, n_metadata: 3, metadata: vec![1, 2, 3], children: vec![] };
+        let node = Node {
+            id: 0,
+            n_children: 0,
+            n_metadata: 3,
+            metadata: vec![1, 2, 3],
+            children: vec![],
+        };
 
-        assert_eq!(fetch_node(0, 0,&input), (node, input.len()));
+        assert_eq!(fetch_node(0, 0, &input), (node, input.len()));
     }
 
     #[test]
     fn test_two_nodes() {
         let input: Vec<usize> = vec![0, 3, 1, 2, 3, 0, 2, 10, 20];
-        let n1 = Node { id: 0, n_children: 0, n_metadata: 3, metadata: vec![1, 2, 3], children: vec![] };
-        let n2 = Node { id: 1, n_children: 0, n_metadata: 2, metadata: vec![10, 20], children: vec![] };
+        let n1 = Node {
+            id: 0,
+            n_children: 0,
+            n_metadata: 3,
+            metadata: vec![1, 2, 3],
+            children: vec![],
+        };
+        let n2 = Node {
+            id: 1,
+            n_children: 0,
+            n_metadata: 2,
+            metadata: vec![10, 20],
+            children: vec![],
+        };
 
         assert_eq!(fetch_node(0, 0, &input), (n1, 5));
         assert_eq!(fetch_node(1, 5, &input), (n2, input.len()));
@@ -177,25 +201,61 @@ mod tests {
     #[test]
     fn test_match_node_start() {
         let input: Vec<usize> = vec![2, 3, 0, 1, 201, 0, 1, 202, 101, 102, 103];
-        let n = Node { id: 0, n_children: 2, n_metadata: 3, children: vec![], metadata: vec![]};
+        let n = Node {
+            id: 0,
+            n_children: 2,
+            n_metadata: 3,
+            children: vec![],
+            metadata: vec![],
+        };
 
-        assert_eq!(fetch_node(0, 0,&input), (n, 2));
+        assert_eq!(fetch_node(0, 0, &input), (n, 2));
     }
 
     #[test]
     fn fetch_root() {
-        let root = Node { id: 0, n_children: 0, n_metadata: 1, children: vec![], metadata: vec![101] };
+        let root = Node {
+            id: 0,
+            n_children: 0,
+            n_metadata: 1,
+            children: vec![],
+            metadata: vec![101],
+        };
         assert_eq!(fetch_all(&vec![0, 1, 101]), vec![root]);
     }
 
     #[test]
     fn fetch_all_small() {
         let input = vec![3, 1, 0, 1, 201, 0, 1, 202, 0, 1, 203, 101];
-        let tree =  vec![
-            Node { id: 0, n_children: 3, n_metadata: 1, metadata: vec![101], children: vec![1, 2, 3] },
-            Node { id: 1, n_children: 0, n_metadata: 1, metadata: vec![201], children: vec![] },
-            Node { id: 2, n_children: 0, n_metadata: 1, metadata: vec![202], children: vec![] },
-            Node { id: 3, n_children: 0, n_metadata: 1, metadata: vec![203], children: vec![] },
+        let tree = vec![
+            Node {
+                id: 0,
+                n_children: 3,
+                n_metadata: 1,
+                metadata: vec![101],
+                children: vec![1, 2, 3],
+            },
+            Node {
+                id: 1,
+                n_children: 0,
+                n_metadata: 1,
+                metadata: vec![201],
+                children: vec![],
+            },
+            Node {
+                id: 2,
+                n_children: 0,
+                n_metadata: 1,
+                metadata: vec![202],
+                children: vec![],
+            },
+            Node {
+                id: 3,
+                n_children: 0,
+                n_metadata: 1,
+                metadata: vec![203],
+                children: vec![],
+            },
         ];
         assert_eq!(fetch_all(&input), tree);
     }
@@ -204,10 +264,34 @@ mod tests {
     fn fetch_all_list() {
         let input = vec![1, 1, 1, 1, 1, 1, 0, 1, 401, 301, 201, 101];
         let tree = vec![
-            Node { id: 0, n_children: 1, n_metadata: 1, metadata: vec![101], children: vec![1] },
-            Node { id: 1, n_children: 1, n_metadata: 1, metadata: vec![201], children: vec![2] },
-            Node { id: 2, n_children: 1, n_metadata: 1, metadata: vec![301], children: vec![3] },
-            Node { id: 3, n_children: 0, n_metadata: 1, metadata: vec![401], children: vec![] },
+            Node {
+                id: 0,
+                n_children: 1,
+                n_metadata: 1,
+                metadata: vec![101],
+                children: vec![1],
+            },
+            Node {
+                id: 1,
+                n_children: 1,
+                n_metadata: 1,
+                metadata: vec![201],
+                children: vec![2],
+            },
+            Node {
+                id: 2,
+                n_children: 1,
+                n_metadata: 1,
+                metadata: vec![301],
+                children: vec![3],
+            },
+            Node {
+                id: 3,
+                n_children: 0,
+                n_metadata: 1,
+                metadata: vec![401],
+                children: vec![],
+            },
         ];
 
         assert_eq!(fetch_all(&input), tree);
@@ -217,10 +301,34 @@ mod tests {
     fn part1() {
         let input = vec![2, 3, 0, 3, 10, 11, 12, 1, 1, 0, 1, 99, 2, 1, 1, 2];
         let tree = vec![
-            Node { id: 0, n_children: 2, n_metadata: 3, metadata: vec![1, 1, 2], children: vec![1, 2] },
-            Node { id: 1, n_children: 0, n_metadata: 3, metadata: vec![10, 11, 12], children: vec![] },
-            Node { id: 2, n_children: 1, n_metadata: 1, metadata: vec![2], children: vec![3] },
-            Node { id: 3, n_children: 0, n_metadata: 1, metadata: vec![99], children: vec![] },
+            Node {
+                id: 0,
+                n_children: 2,
+                n_metadata: 3,
+                metadata: vec![1, 1, 2],
+                children: vec![1, 2],
+            },
+            Node {
+                id: 1,
+                n_children: 0,
+                n_metadata: 3,
+                metadata: vec![10, 11, 12],
+                children: vec![],
+            },
+            Node {
+                id: 2,
+                n_children: 1,
+                n_metadata: 1,
+                metadata: vec![2],
+                children: vec![3],
+            },
+            Node {
+                id: 3,
+                n_children: 0,
+                n_metadata: 1,
+                metadata: vec![99],
+                children: vec![],
+            },
         ];
 
         assert_eq!(fetch_all(&input), tree);

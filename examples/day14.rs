@@ -2,7 +2,7 @@ fn digits(number: usize) -> Vec<usize> {
     if number < 10 {
         vec![number]
     } else {
-        vec![1, number-10]
+        vec![1, number - 10]
     }
 }
 
@@ -34,7 +34,7 @@ fn answer(mut state: Vec<usize>, count: usize, query: usize) -> Vec<usize> {
     }
 
     let mut result = vec![];
-    for i in count..(count+query) {
+    for i in count..(count + query) {
         result.push(state[i]);
     }
     result
@@ -70,8 +70,7 @@ fn reverse(mut state: Vec<usize>, mask: Vec<usize>) -> usize {
     let mut len = state.len();
 
     let mut iter = 0;
-    'outer:
-    loop {
+    'outer: loop {
         let one = state[fst];
         let two = state[snd];
 
@@ -110,7 +109,7 @@ pub fn main() {
         println!("{:?}", result); // 5101271252
     }
     {
-        let result = reverse(state.clone(), vec![0,3,0,1,2,1]);
+        let result = reverse(state.clone(), vec![0, 3, 0, 1, 2, 1]);
         println!("{}", result); // 20287556
     }
 }
@@ -121,25 +120,36 @@ mod tests {
 
     #[test]
     fn test_answer() {
-        assert_eq!(answer(vec![3, 7],    5, 10), vec![0,1,2,4,5,1,5,8,9,1]);
-        assert_eq!(answer(vec![3, 7],    9, 10), vec![5,1,5,8,9,1,6,7,7,9]);
-        assert_eq!(answer(vec![3, 7],   18, 10), vec![9,2,5,1,0,7,1,0,8,5]);
-        assert_eq!(answer(vec![3, 7], 2018, 10), vec![5,9,4,1,4,2,9,8,8,2]);
+        assert_eq!(
+            answer(vec![3, 7], 5, 10),
+            vec![0, 1, 2, 4, 5, 1, 5, 8, 9, 1]
+        );
+        assert_eq!(
+            answer(vec![3, 7], 9, 10),
+            vec![5, 1, 5, 8, 9, 1, 6, 7, 7, 9]
+        );
+        assert_eq!(
+            answer(vec![3, 7], 18, 10),
+            vec![9, 2, 5, 1, 0, 7, 1, 0, 8, 5]
+        );
+        assert_eq!(
+            answer(vec![3, 7], 2018, 10),
+            vec![5, 9, 4, 1, 4, 2, 9, 8, 8, 2]
+        );
     }
 
     #[test]
     fn test_checksum() {
-        assert_eq!(checksum(&vec![5,1,5,8,9], 3, 5), 0);
-        assert_eq!(checksum(&vec![5,1,5,8,9], 0, 5), 51589);
-        assert_eq!(checksum(&vec![5,9,4,1,4], 0, 5), 59414);
+        assert_eq!(checksum(&vec![5, 1, 5, 8, 9], 3, 5), 0);
+        assert_eq!(checksum(&vec![5, 1, 5, 8, 9], 0, 5), 51589);
+        assert_eq!(checksum(&vec![5, 9, 4, 1, 4], 0, 5), 59414);
     }
 
     #[test]
     fn test_reverse() {
-        assert_eq!(reverse(vec![3,7], vec![5,1,5,8,9]),    9);
-        assert_eq!(reverse(vec![3,7], vec![0,1,2,4,5]),    5);
-        assert_eq!(reverse(vec![3,7], vec![9,2,5,1,0]),   18);
-        assert_eq!(reverse(vec![3,7], vec![5,9,4,1,4]), 2018);
+        assert_eq!(reverse(vec![3, 7], vec![5, 1, 5, 8, 9]), 9);
+        assert_eq!(reverse(vec![3, 7], vec![0, 1, 2, 4, 5]), 5);
+        assert_eq!(reverse(vec![3, 7], vec![9, 2, 5, 1, 0]), 18);
+        assert_eq!(reverse(vec![3, 7], vec![5, 9, 4, 1, 4]), 2018);
     }
-
 }

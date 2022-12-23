@@ -20,13 +20,12 @@ impl Grid {
 
     fn dump(&self) -> Vec<String> {
         let mut chars = self.chars.clone();
-        chars.into_iter()
-            .map(|cs| cs.iter().collect())
-            .collect()
+        chars.into_iter().map(|cs| cs.iter().collect()).collect()
     }
 
     fn count<F>(&self, f: F) -> usize
-        where F: Fn(char) -> bool
+    where
+        F: Fn(char) -> bool,
     {
         let mut acc = 0;
         for row in &self.chars {
@@ -49,12 +48,18 @@ impl Grid {
 
     fn adj(&self, x: isize, y: isize) -> Vec<char> {
         let cells = vec![
-            (x-1,y-1), (x,y-1), (x+1,y-1),
-            (x-1,  y), /*skip*/ (x+1,  y),
-            (x-1,y+1), (x,y+1), (x+1,y+1),
+            (x - 1, y - 1),
+            (x, y - 1),
+            (x + 1, y - 1),
+            (x - 1, y),
+            /*skip*/ (x + 1, y),
+            (x - 1, y + 1),
+            (x, y + 1),
+            (x + 1, y + 1),
         ];
         let (rs, cs) = (self.rows as isize, self.cols as isize);
-        cells.into_iter()
+        cells
+            .into_iter()
             .filter_map(|p| {
                 let (x, y) = p;
                 if x >= 0 && y >= 0 && x < cs && y < rs {
@@ -100,7 +105,7 @@ fn mutate(grid: &Grid, x: usize, y: usize) -> char {
         ('|', (gr, tr, ly)) if ly >= 3 => '#',
         ('#', (gr, tr, ly)) if ly >= 1 && tr >= 1 => '#',
         ('#', (gr, tr, ly)) => '.',
-        _ => c
+        _ => c,
     }
 }
 
@@ -146,7 +151,10 @@ fn iterate(this: Grid, k: usize) -> Grid {
 
 fn get_input() -> Vec<String> {
     let stdin = io::stdin();
-    let lines = stdin.lock().lines().into_iter()
+    let lines = stdin
+        .lock()
+        .lines()
+        .into_iter()
         .map(Result::unwrap)
         .collect();
     lines

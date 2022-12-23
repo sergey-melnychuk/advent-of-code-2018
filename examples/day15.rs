@@ -1,14 +1,14 @@
 use std::io;
 use std::io::prelude::*;
 
-use std::collections::VecDeque;
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::collections::VecDeque;
 
 #[derive(Eq, PartialEq, Debug, Clone, Copy, Hash)]
 struct V2 {
     row: usize,
-    col: usize
+    col: usize,
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Copy)]
@@ -23,7 +23,10 @@ impl Unit {
         if that.health <= self.attack {
             None
         } else {
-            Some( Unit { health: that.health - self.attack, ..that } )
+            Some(Unit {
+                health: that.health - self.attack,
+                ..that
+            })
         }
     }
 }
@@ -38,9 +41,11 @@ struct Grid {
 
 impl Grid {
     fn parse<F>(lines: Vec<String>, f: F) -> Grid
-        where F: Fn(char, usize, usize) -> Option<Unit>
+    where
+        F: Fn(char, usize, usize) -> Option<Unit>,
     {
-        let mut cells: Vec<Vec<char>> = lines.into_iter()
+        let mut cells: Vec<Vec<char>> = lines
+            .into_iter()
             .map(|line| line.chars().collect())
             .collect();
         let rows = cells.len();
@@ -55,7 +60,12 @@ impl Grid {
                 }
             }
         }
-        Grid { rows, cols, cells, units }
+        Grid {
+            rows,
+            cols,
+            cells,
+            units,
+        }
     }
 
     fn count(&self, kind: char) -> usize {
@@ -79,16 +89,28 @@ impl Grid {
         } else {
             let mut result = Vec::new();
             if pos.row > 0 && self.cells[pos.row - 1][pos.col] != '#' {
-                result.push(V2 { row: pos.row - 1, ..pos }); // N
+                result.push(V2 {
+                    row: pos.row - 1,
+                    ..pos
+                }); // N
             }
-            if pos.col > 0 && self.cells[pos.row][pos.col - 1] != '#'{
-                result.push(V2 { col: pos.col - 1, ..pos }); // W
+            if pos.col > 0 && self.cells[pos.row][pos.col - 1] != '#' {
+                result.push(V2 {
+                    col: pos.col - 1,
+                    ..pos
+                }); // W
             }
             if pos.col < self.cols - 1 && self.cells[pos.row][pos.col + 1] != '#' {
-                result.push(V2 { col: pos.col + 1, ..pos }); // E
+                result.push(V2 {
+                    col: pos.col + 1,
+                    ..pos
+                }); // E
             }
             if pos.row < self.rows - 1 && self.cells[pos.row + 1][pos.col] != '#' {
-                result.push(V2 { row: pos.row + 1, ..pos }); // S
+                result.push(V2 {
+                    row: pos.row + 1,
+                    ..pos
+                }); // S
             }
             result
         }
@@ -194,7 +216,7 @@ impl Grid {
                     min = unit.health;
                     found = Some(at)
                 }
-                _ => ()
+                _ => (),
             }
         }
 
@@ -222,16 +244,17 @@ impl Grid {
                 if opt.is_some() {
                     let u = opt.unwrap();
                     chars[r][c] = u.kind;
-                    let mut val = format!(" {}/{}", u.kind, u.health).chars().into_iter().collect();
+                    let mut val = format!(" {}/{}", u.kind, u.health)
+                        .chars()
+                        .into_iter()
+                        .collect();
                     chars[r].append(&mut val);
                     //println!("\tdump: add unit at r={} c={} {}/{}", r, c, u.kind, u.health);
                 }
             }
         }
 
-        chars.into_iter()
-            .map(|cs| cs.iter().collect())
-            .collect()
+        chars.into_iter().map(|cs| cs.iter().collect()).collect()
     }
 }
 
@@ -335,7 +358,7 @@ fn solve(grid: &mut Grid) -> usize {
         }
     }
 
-    (round-1) * sum // workaround that leads to correct answer, don't ask why
+    (round - 1) * sum // workaround that leads to correct answer, don't ask why
 }
 
 pub fn main() {
@@ -344,7 +367,11 @@ pub fn main() {
         // Part 1
         let mut grid = Grid::parse(input.clone(), |chr, _row, _col| {
             if chr == 'E' || chr == 'G' {
-                Some(Unit { kind: chr, health: 200, attack: 3 })
+                Some(Unit {
+                    kind: chr,
+                    health: 200,
+                    attack: 3,
+                })
             } else {
                 None
             }
@@ -358,9 +385,17 @@ pub fn main() {
             //println!("attack: {}", attack);
             let mut grid = Grid::parse(input.clone(), |chr, _row, _col| {
                 if chr == 'E' {
-                    Some(Unit { kind: chr, health: 200, attack })
+                    Some(Unit {
+                        kind: chr,
+                        health: 200,
+                        attack,
+                    })
                 } else if chr == 'G' {
-                    Some(Unit { kind: chr, health: 200, attack: 3 })
+                    Some(Unit {
+                        kind: chr,
+                        health: 200,
+                        attack: 3,
+                    })
                 } else {
                     None
                 }
@@ -387,7 +422,11 @@ mod tests {
     fn make_grid(lines: Vec<&'static str>, health: usize, attack: usize) -> Grid {
         Grid::parse(wrap(lines), |chr: char, _row: usize, _col: usize| {
             if chr == 'E' || chr == 'G' {
-                Some(Unit { kind: chr, health, attack })
+                Some(Unit {
+                    kind: chr,
+                    health,
+                    attack,
+                })
             } else {
                 None
             }
@@ -396,333 +435,374 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        let grid = make_grid(vec![
-            "#####",
-            "#E.E#",
-            "#.G.#",
-            "#E.E#",
-            "#####",
-        ], 10, 1);
+        let grid = make_grid(vec!["#####", "#E.E#", "#.G.#", "#E.E#", "#####"], 10, 1);
         let gr = &grid;
-        assert_eq!(gr.cells, vec![
-            vec!['#', '#', '#', '#', '#'],
-            vec!['#', '.', '.', '.', '#'],
-            vec!['#', '.', '.', '.', '#'],
-            vec!['#', '.', '.', '.', '#'],
-            vec!['#', '#', '#', '#', '#'],
-        ]);
-        let e = Unit { kind: 'E', health: 10, attack: 1 };
-        let g = Unit { kind: 'G', health: 10, attack: 1 };
-        assert_eq!(gr.units, vec![
-            vec![None,    None,    None,    None, None],
-            vec![None, Some(e),    None, Some(e), None],
-            vec![None,    None, Some(g),    None, None],
-            vec![None, Some(e),    None, Some(e), None],
-            vec![None,    None,    None,    None, None],
-        ]);
+        assert_eq!(
+            gr.cells,
+            vec![
+                vec!['#', '#', '#', '#', '#'],
+                vec!['#', '.', '.', '.', '#'],
+                vec!['#', '.', '.', '.', '#'],
+                vec!['#', '.', '.', '.', '#'],
+                vec!['#', '#', '#', '#', '#'],
+            ]
+        );
+        let e = Unit {
+            kind: 'E',
+            health: 10,
+            attack: 1,
+        };
+        let g = Unit {
+            kind: 'G',
+            health: 10,
+            attack: 1,
+        };
+        assert_eq!(
+            gr.units,
+            vec![
+                vec![None, None, None, None, None],
+                vec![None, Some(e), None, Some(e), None],
+                vec![None, None, Some(g), None, None],
+                vec![None, Some(e), None, Some(e), None],
+                vec![None, None, None, None, None],
+            ]
+        );
     }
 
     #[test]
     fn test_target_1() {
-        let grid = make_grid(vec![
-            "#######",
-            "#E...E#",
-            "#.....#",
-            "#..G..#",
-            "#.....#",
-            "#E...E#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "#######", "#E...E#", "#.....#", "#..G..#", "#.....#", "#E...E#", "#######",
+            ],
+            10,
+            1,
+        );
 
-        assert_eq!(grid.target(V2 { row: 3, col: 3 }, 'E'), Some(V2 { row: 2, col: 3 }));
-        assert_eq!(grid.target(V2 { row: 1, col: 1 }, 'G'), Some(V2 { row: 1, col: 2 }));
-        assert_eq!(grid.target(V2 { row: 1, col: 5 }, 'G'), Some(V2 { row: 1, col: 4 }));
-        assert_eq!(grid.target(V2 { row: 5, col: 1 }, 'G'), Some(V2 { row: 4, col: 1 }));
-        assert_eq!(grid.target(V2 { row: 5, col: 5 }, 'G'), Some(V2 { row: 4, col: 5 }));
+        assert_eq!(
+            grid.target(V2 { row: 3, col: 3 }, 'E'),
+            Some(V2 { row: 2, col: 3 })
+        );
+        assert_eq!(
+            grid.target(V2 { row: 1, col: 1 }, 'G'),
+            Some(V2 { row: 1, col: 2 })
+        );
+        assert_eq!(
+            grid.target(V2 { row: 1, col: 5 }, 'G'),
+            Some(V2 { row: 1, col: 4 })
+        );
+        assert_eq!(
+            grid.target(V2 { row: 5, col: 1 }, 'G'),
+            Some(V2 { row: 4, col: 1 })
+        );
+        assert_eq!(
+            grid.target(V2 { row: 5, col: 5 }, 'G'),
+            Some(V2 { row: 4, col: 5 })
+        );
     }
-
 
     #[test]
     fn test_find_2() {
-        let grid = make_grid(vec![
-            "#####",
-            "#...#",
-            "#GG.#",
-            "#..E#",
-            "#####",
-        ], 10, 1);
+        let grid = make_grid(vec!["#####", "#...#", "#GG.#", "#..E#", "#####"], 10, 1);
 
         let pos = V2 { row: 2, col: 2 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 2, col: 2 },
-            V2 { row: 2, col: 3 },
-            V2 { row: 3, col: 3 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 2, col: 2 },
+                V2 { row: 2, col: 3 },
+                V2 { row: 3, col: 3 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_3() {
-        let grid = make_grid(vec![
-            "#####",
-            "#...#",
-            "#GG.#",
-            "#..E#",
-            "#####",
-        ], 10, 1);
+        let grid = make_grid(vec!["#####", "#...#", "#GG.#", "#..E#", "#####"], 10, 1);
 
         let pos = V2 { row: 2, col: 1 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 2, col: 1 },
-            V2 { row: 3, col: 1 },
-            V2 { row: 3, col: 2 },
-            V2 { row: 3, col: 3 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 2, col: 1 },
+                V2 { row: 3, col: 1 },
+                V2 { row: 3, col: 2 },
+                V2 { row: 3, col: 3 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_4() {
-        let grid = make_grid(vec![
-            "#####",
-            "#...#",
-            "#GGE#",
-            "#...#",
-            "#####",
-        ], 10, 1);
+        let grid = make_grid(vec!["#####", "#...#", "#GGE#", "#...#", "#####"], 10, 1);
 
         let pos = V2 { row: 2, col: 1 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 2, col: 1 },
-            V2 { row: 1, col: 1 },
-            V2 { row: 1, col: 2 },
-            V2 { row: 1, col: 3 },
-            V2 { row: 2, col: 3 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 2, col: 1 },
+                V2 { row: 1, col: 1 },
+                V2 { row: 1, col: 2 },
+                V2 { row: 1, col: 3 },
+                V2 { row: 2, col: 3 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_5() {
-        let grid = make_grid(vec![
-            "#####",
-            "#...#",
-            "#.G.#",
-            "#.G.#",
-            "#.E.#",
-            "#####",
-        ], 10, 1);
+        let grid = make_grid(
+            vec!["#####", "#...#", "#.G.#", "#.G.#", "#.E.#", "#####"],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 2, col: 2 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 2, col: 2 },
-            V2 { row: 2, col: 1 },
-            V2 { row: 3, col: 1 },
-            V2 { row: 4, col: 1 },
-            V2 { row: 4, col: 2 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 2, col: 2 },
+                V2 { row: 2, col: 1 },
+                V2 { row: 3, col: 1 },
+                V2 { row: 4, col: 1 },
+                V2 { row: 4, col: 2 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_triangle_up1() {
-        let grid = make_grid(vec![
-            "#######",
-            "#G...E#",
-            "#...E.#",
-            "#..E..#",
-            "#.E...#",
-            "#E....#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "#######", "#G...E#", "#...E.#", "#..E..#", "#.E...#", "#E....#", "#######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 1, col: 1 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 1, col: 1 },
-            V2 { row: 1, col: 2 },
-            V2 { row: 1, col: 3 },
-            V2 { row: 1, col: 4 },
-            V2 { row: 1, col: 5 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 1, col: 1 },
+                V2 { row: 1, col: 2 },
+                V2 { row: 1, col: 3 },
+                V2 { row: 1, col: 4 },
+                V2 { row: 1, col: 5 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_triangle_up2() {
-        let grid = make_grid(vec![
-            "#######",
-            "#E...G#",
-            "#.E...#",
-            "#..E..#",
-            "#...E.#",
-            "#....E#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "#######", "#E...G#", "#.E...#", "#..E..#", "#...E.#", "#....E#", "#######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 1, col: 5 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 1, col: 5 },
-            V2 { row: 1, col: 4 },
-            V2 { row: 1, col: 3 },
-            V2 { row: 1, col: 2 },
-            V2 { row: 1, col: 1 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 1, col: 5 },
+                V2 { row: 1, col: 4 },
+                V2 { row: 1, col: 3 },
+                V2 { row: 1, col: 2 },
+                V2 { row: 1, col: 1 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_triangle_dn1() {
-        let grid = make_grid(vec![
-            "#######",
-            "#....E#",
-            "#...E.#",
-            "#..E..#",
-            "#.E...#",
-            "#E...G#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "#######", "#....E#", "#...E.#", "#..E..#", "#.E...#", "#E...G#", "#######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 5, col: 5 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 5, col: 5 },
-            V2 { row: 4, col: 5 },
-            V2 { row: 3, col: 5 },
-            V2 { row: 2, col: 5 },
-            V2 { row: 1, col: 5 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 5, col: 5 },
+                V2 { row: 4, col: 5 },
+                V2 { row: 3, col: 5 },
+                V2 { row: 2, col: 5 },
+                V2 { row: 1, col: 5 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_triangle_dn2() {
-        let grid = make_grid(vec![
-            "#######",
-            "#E....#",
-            "#.E...#",
-            "#..E..#",
-            "#...E.#",
-            "#G...E#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "#######", "#E....#", "#.E...#", "#..E..#", "#...E.#", "#G...E#", "#######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 5, col: 1 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 5, col: 1 },
-            V2 { row: 4, col: 1 },
-            V2 { row: 3, col: 1 },
-            V2 { row: 2, col: 1 },
-            V2 { row: 1, col: 1 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 5, col: 1 },
+                V2 { row: 4, col: 1 },
+                V2 { row: 3, col: 1 },
+                V2 { row: 2, col: 1 },
+                V2 { row: 1, col: 1 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_diamond1() {
-        let grid = make_grid(vec![
-            "###########",
-            "#....E....#",
-            "#...E.E...#",
-            "#..E...E..#",
-            "#.E.....E.#",
-            "#E...G...E#",
-            "#.E.....E.#",
-            "#..E...E..#",
-            "#...E.E...#",
-            "#....E....#",
-            "###########",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "###########",
+                "#....E....#",
+                "#...E.E...#",
+                "#..E...E..#",
+                "#.E.....E.#",
+                "#E...G...E#",
+                "#.E.....E.#",
+                "#..E...E..#",
+                "#...E.E...#",
+                "#....E....#",
+                "###########",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 5, col: 5 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 5, col: 5 },
-            V2 { row: 4, col: 5 },
-            V2 { row: 3, col: 5 },
-            V2 { row: 2, col: 5 },
-            V2 { row: 1, col: 5 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 5, col: 5 },
+                V2 { row: 4, col: 5 },
+                V2 { row: 3, col: 5 },
+                V2 { row: 2, col: 5 },
+                V2 { row: 1, col: 5 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_diamond2() {
-        let grid = make_grid(vec![
-            "###########",
-            "#....E....#",
-            "#...E#E...#",
-            "#..E...E..#",
-            "#.E.....E.#",
-            "#E...G...E#",
-            "#.E.....E.#",
-            "#..E...E..#",
-            "#...E.E...#",
-            "#....E....#",
-            "###########",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "###########",
+                "#....E....#",
+                "#...E#E...#",
+                "#..E...E..#",
+                "#.E.....E.#",
+                "#E...G...E#",
+                "#.E.....E.#",
+                "#..E...E..#",
+                "#...E.E...#",
+                "#....E....#",
+                "###########",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 5, col: 5 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 5, col: 5 },
-            V2 { row: 4, col: 5 },
-            V2 { row: 3, col: 5 },
-            V2 { row: 3, col: 4 },
-            V2 { row: 2, col: 4 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 5, col: 5 },
+                V2 { row: 4, col: 5 },
+                V2 { row: 3, col: 5 },
+                V2 { row: 3, col: 4 },
+                V2 { row: 2, col: 4 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_diamond3() {
-        let grid = make_grid(vec![
-            "###########",
-            "#....E....#",
-            "#...E#E...#",
-            "#..E##.E..#", // (3,6) must be chosen, as first in reading order
-            "#.E..G..E.#",
-            "#E.......E#",
-            "#.E.....E.#",
-            "#..E...E..#",
-            "#...E.E...#",
-            "#....E....#",
-            "###########",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "###########",
+                "#....E....#",
+                "#...E#E...#",
+                "#..E##.E..#", // (3,6) must be chosen, as first in reading order
+                "#.E..G..E.#",
+                "#E.......E#",
+                "#.E.....E.#",
+                "#..E...E..#",
+                "#...E.E...#",
+                "#....E....#",
+                "###########",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 4, col: 5 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 4, col: 5 },
-            V2 { row: 4, col: 6 },
-            V2 { row: 3, col: 6 },
-            V2 { row: 2, col: 6 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 4, col: 5 },
+                V2 { row: 4, col: 6 },
+                V2 { row: 3, col: 6 },
+                V2 { row: 2, col: 6 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_second() {
-        let grid = make_grid(vec![
-            "#########",  //  "#########",
-            "#...E...#",  //  "#.@@E...#",
-            "#....E..#",  //  "#.@..E..#",
-            "#..######",  //  "#.@######",
-            "#.......#",  //  "#.@@@...#",
-            "#...G...#",  //  "#...G...#",
-            "#..######",  //  "#..######",
-            "#.......#",  //  "#.......#",
-            "#....E..#",  //  "#....E..#",
-            "#########",  //  "#########",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "#########", //  "#########",
+                "#...E...#", //  "#.@@E...#",
+                "#....E..#", //  "#.@..E..#",
+                "#..######", //  "#.@######",
+                "#.......#", //  "#.@@@...#",
+                "#...G...#", //  "#...G...#",
+                "#..######", //  "#..######",
+                "#.......#", //  "#.......#",
+                "#....E..#", //  "#....E..#",
+                "#########", //  "#########",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 5, col: 4 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 5, col: 4 },
-            V2 { row: 4, col: 4 },
-            V2 { row: 4, col: 3 },
-            V2 { row: 4, col: 2 },
-            V2 { row: 3, col: 2 },
-            V2 { row: 2, col: 2 },
-            V2 { row: 1, col: 2 },
-            V2 { row: 1, col: 3 },
-            V2 { row: 1, col: 4 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 5, col: 4 },
+                V2 { row: 4, col: 4 },
+                V2 { row: 4, col: 3 },
+                V2 { row: 4, col: 2 },
+                V2 { row: 3, col: 2 },
+                V2 { row: 2, col: 2 },
+                V2 { row: 1, col: 2 },
+                V2 { row: 1, col: 3 },
+                V2 { row: 1, col: 4 },
+            ]
+        );
     }
 
     #[test]
     fn test_target1() {
-        let grid = make_grid(vec![
-            "#######",
-            "#E..G.#",
-            "#...#.#",
-            "#.G.#G#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec!["#######", "#E..G.#", "#...#.#", "#.G.#G#", "#######"],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 1, col: 1 };
         assert_eq!(grid.target(pos, 'G'), Some(V2 { row: 1, col: 2 }));
@@ -730,13 +810,11 @@ mod tests {
 
     #[test]
     fn test_target2_1() {
-        let grid = make_grid(vec![
-            "#######",
-            "#.E...#",
-            "#.....#",
-            "#...G.#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec!["#######", "#.E...#", "#.....#", "#...G.#", "#######"],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 1, col: 2 };
         assert_eq!(grid.target(pos, 'G'), Some(V2 { row: 1, col: 3 }));
@@ -744,13 +822,11 @@ mod tests {
 
     #[test]
     fn test_target2_2() {
-        let grid = make_grid(vec![
-            "#######",
-            "#..E..#",
-            "#.....#",
-            "#...G.#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec!["#######", "#..E..#", "#.....#", "#...G.#", "#######"],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 1, col: 3 };
         assert_eq!(grid.target(pos, 'G'), Some(V2 { row: 1, col: 4 }));
@@ -758,13 +834,11 @@ mod tests {
 
     #[test]
     fn test_target2_3() {
-        let grid = make_grid(vec![
-            "#######",
-            "#...E.#",
-            "#.....#",
-            "#...G.#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec!["#######", "#...E.#", "#.....#", "#...G.#", "#######"],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 1, col: 4 };
         assert_eq!(grid.target(pos, 'G'), Some(V2 { row: 2, col: 4 }));
@@ -772,13 +846,11 @@ mod tests {
 
     #[test]
     fn test_target2_4() {
-        let grid = make_grid(vec![
-            "#######",
-            "#.....#",
-            "#...E.#",
-            "#...G.#",
-            "#######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec!["#######", "#.....#", "#...E.#", "#...G.#", "#######"],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 2, col: 4 };
         assert_eq!(grid.target(pos, 'G'), Some(V2 { row: 3, col: 4 }));
@@ -786,278 +858,300 @@ mod tests {
 
     #[test]
     fn test_find_between2() {
-        let grid = make_grid(vec![
-            "#####",
-            "#..E#",
-            "#G..#",
-            "#..E#",
-            "#####",
-        ], 10, 1);
+        let grid = make_grid(vec!["#####", "#..E#", "#G..#", "#..E#", "#####"], 10, 1);
 
         let pos = V2 { row: 2, col: 1 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 2, col: 1 },
-            V2 { row: 1, col: 1 },
-            V2 { row: 1, col: 2 },
-            V2 { row: 1, col: 3 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 2, col: 1 },
+                V2 { row: 1, col: 1 },
+                V2 { row: 1, col: 2 },
+                V2 { row: 1, col: 3 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_between4_corners() {
-        let grid = make_grid(vec![
-            "######",
-            "#E...E#",
-            "#.....#",
-            "#..G..#",
-            "#.....#",
-            "#E...E#",
-            "######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "######", "#E...E#", "#.....#", "#..G..#", "#.....#", "#E...E#", "######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 3, col: 3 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 3, col: 3 },
-            V2 { row: 2, col: 3 },
-            V2 { row: 1, col: 3 },
-            V2 { row: 1, col: 2 },
-            V2 { row: 1, col: 1 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 3, col: 3 },
+                V2 { row: 2, col: 3 },
+                V2 { row: 1, col: 3 },
+                V2 { row: 1, col: 2 },
+                V2 { row: 1, col: 1 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_between4_edges() {
-        let grid = make_grid(vec![
-            "######",
-            "#..E..#",
-            "#.....#",
-            "#E.G.E#",
-            "#.....#",
-            "#..E..#",
-            "######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "######", "#..E..#", "#.....#", "#E.G.E#", "#.....#", "#..E..#", "######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 3, col: 3 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 3, col: 3 },
-            V2 { row: 2, col: 3 },
-            V2 { row: 1, col: 3 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 3, col: 3 },
+                V2 { row: 2, col: 3 },
+                V2 { row: 1, col: 3 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_between4_wall1() {
-        let grid = make_grid(vec![
-            "######",
-            "#..E..#",
-            "#..####",
-            "#E.G.E#",
-            "#.....#",
-            "#..E..#",
-            "######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "######", "#..E..#", "#..####", "#E.G.E#", "#.....#", "#..E..#", "######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 3, col: 3 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 3, col: 3 },
-            V2 { row: 3, col: 2 },
-            V2 { row: 3, col: 1 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 3, col: 3 },
+                V2 { row: 3, col: 2 },
+                V2 { row: 3, col: 1 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_between4_wall2() {
-        let grid = make_grid(vec![
-            "######",
-            "#..E..#",
-            "#.#####",
-            "#E#G.E#",
-            "#.#...#",
-            "#..E..#",
-            "######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "######", "#..E..#", "#.#####", "#E#G.E#", "#.#...#", "#..E..#", "######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 3, col: 3 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 3, col: 3 },
-            V2 { row: 3, col: 4 },
-            V2 { row: 3, col: 5 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 3, col: 3 },
+                V2 { row: 3, col: 4 },
+                V2 { row: 3, col: 5 },
+            ]
+        );
     }
 
     #[test]
     fn test_find_between4_wall3() {
-        let grid = make_grid(vec![
-            "######",
-            "#..E..#",
-            "#.#####",
-            "#E#G#E#",
-            "#.#...#",
-            "#..E..#",
-            "######",
-        ], 10, 1);
+        let grid = make_grid(
+            vec![
+                "######", "#..E..#", "#.#####", "#E#G#E#", "#.#...#", "#..E..#", "######",
+            ],
+            10,
+            1,
+        );
 
         let pos = V2 { row: 3, col: 3 };
-        assert_eq!(grid.find(pos, 'E'), vec![
-            V2 { row: 3, col: 3 },
-            V2 { row: 4, col: 3 },
-            V2 { row: 5, col: 3 },
-        ]);
+        assert_eq!(
+            grid.find(pos, 'E'),
+            vec![
+                V2 { row: 3, col: 3 },
+                V2 { row: 4, col: 3 },
+                V2 { row: 5, col: 3 },
+            ]
+        );
     }
 
     #[test]
     #[ignore] // it just doesn't fit the (round-1)*sum approach (that gives correct answers)
     fn test_solve1() {
-        let mut grid = make_grid(vec![
-            "#######",
-            "#.G...#",
-            "#...EG#",
-            "#.#.#G#",
-            "#..G#E#",
-            "#.....#",
-            "#######",
-        ], 200, 3);
+        let mut grid = make_grid(
+            vec![
+                "#######", "#.G...#", "#...EG#", "#.#.#G#", "#..G#E#", "#.....#", "#######",
+            ],
+            200,
+            3,
+        );
 
         assert_eq!(solve(&mut grid), 27730);
     }
 
     #[test]
     fn test_solve2() {
-        let mut grid = make_grid(vec![
-            "#######",
-            "#G..#E#",
-            "#E#E.E#",
-            "#G.##.#",
-            "#...#E#",
-            "#...E.#",
-            "#######",
-        ], 200, 3);
+        let mut grid = make_grid(
+            vec![
+                "#######", "#G..#E#", "#E#E.E#", "#G.##.#", "#...#E#", "#...E.#", "#######",
+            ],
+            200,
+            3,
+        );
 
         let x = solve(&mut grid);
 
-        assert_eq!(grid.dump(), wrap(vec![
-            "#######",
-            "#...#E# E/200",
-            "#E#...# E/197",
-            "#.E##.# E/185",
-            "#E..#E# E/200 E/200",
-            "#.....#",
-            "#######",
-        ]));
+        assert_eq!(
+            grid.dump(),
+            wrap(vec![
+                "#######",
+                "#...#E# E/200",
+                "#E#...# E/197",
+                "#.E##.# E/185",
+                "#E..#E# E/200 E/200",
+                "#.....#",
+                "#######",
+            ])
+        );
         assert_eq!(x, 36334);
     }
 
     #[test]
     fn test_solve3() {
-        let mut grid = make_grid(vec![
-            "#######",
-            "#E..EG#",
-            "#.#G.E#",
-            "#E.##E#",
-            "#G..#.#",
-            "#..E#.#",
-            "#######",
-        ], 200, 3);
+        let mut grid = make_grid(
+            vec![
+                "#######", "#E..EG#", "#.#G.E#", "#E.##E#", "#G..#.#", "#..E#.#", "#######",
+            ],
+            200,
+            3,
+        );
 
         let x = solve(&mut grid);
 
-        assert_eq!(grid.dump(), wrap(vec![
-            "#######",
-            "#.E.E.# E/164 E/197",
-            "#.#E..# E/200",
-            "#E.##.# E/98",
-            "#.E.#.# E/200",
-            "#...#.#",
-            "#######",
-        ]));
+        assert_eq!(
+            grid.dump(),
+            wrap(vec![
+                "#######",
+                "#.E.E.# E/164 E/197",
+                "#.#E..# E/200",
+                "#E.##.# E/98",
+                "#.E.#.# E/200",
+                "#...#.#",
+                "#######",
+            ])
+        );
         assert_eq!(x, 39514);
     }
 
     #[test]
     fn test_solve6() {
-        let mut grid = make_grid(vec![
-            "#########",
-            "#G......#",
-            "#.E.#...#",
-            "#..##..G#",
-            "#...##..#",
-            "#...#...#",
-            "#.G...G.#",
-            "#.....G.#",
-            "#########",
-        ], 200, 3);
+        let mut grid = make_grid(
+            vec![
+                "#########",
+                "#G......#",
+                "#.E.#...#",
+                "#..##..G#",
+                "#...##..#",
+                "#...#...#",
+                "#.G...G.#",
+                "#.....G.#",
+                "#########",
+            ],
+            200,
+            3,
+        );
         let x = solve(&mut grid);
 
-        assert_eq!(grid.dump(), wrap(vec![
-            "#########",
-            "#.G.....# G/137",
-            "#G.G#...# G/200 G/200",
-            "#.G##...# G/200",
-            "#...##..#",
-            "#.G.#...# G/200",
-            "#.......#",
-            "#.......#",
-            "#########",
-        ]));
+        assert_eq!(
+            grid.dump(),
+            wrap(vec![
+                "#########",
+                "#.G.....# G/137",
+                "#G.G#...# G/200 G/200",
+                "#.G##...# G/200",
+                "#...##..#",
+                "#.G.#...# G/200",
+                "#.......#",
+                "#.......#",
+                "#########",
+            ])
+        );
 
         assert_eq!(x, 18740);
     }
 
     #[test]
     fn test_simulation() {
-        let mut grid = make_grid(vec![
-            "#########",
-            "#G..G..G# G/10 G/10 G/10",
-            "#.......#",
-            "#.......#",
-            "#G..E..G# G/10 E/10 G/10",
-            "#.......#",
-            "#.......#",
-            "#G..G..G# G/10 G/10 G/10",
-            "#########",
-        ], 10, 2);
+        let mut grid = make_grid(
+            vec![
+                "#########",
+                "#G..G..G# G/10 G/10 G/10",
+                "#.......#",
+                "#.......#",
+                "#G..E..G# G/10 E/10 G/10",
+                "#.......#",
+                "#.......#",
+                "#G..G..G# G/10 G/10 G/10",
+                "#########",
+            ],
+            10,
+            2,
+        );
 
         println!("\nstep 1:");
         simulation(&mut grid);
-        assert_eq!(grid.dump(), wrap(vec![
-            "#########",
-            "#.G...G.# G/10 G/10",
-            "#...G...# G/8",
-            "#...E..G# E/10 G/10",
-            "#.G.....# G/10",
-            "#.......#",
-            "#G..G..G# G/10 G/10 G/10",
-            "#.......#",
-            "#########",
-        ]));
+        assert_eq!(
+            grid.dump(),
+            wrap(vec![
+                "#########",
+                "#.G...G.# G/10 G/10",
+                "#...G...# G/8",
+                "#...E..G# E/10 G/10",
+                "#.G.....# G/10",
+                "#.......#",
+                "#G..G..G# G/10 G/10 G/10",
+                "#.......#",
+                "#########",
+            ])
+        );
 
         println!("\nstep 2:");
         simulation(&mut grid);
-        assert_eq!(grid.dump(), wrap(vec![
-            "#########",
-            "#..G.G..# G/10 G/10",
-            "#...G...# G/6",
-            "#.G.E.G.# G/10 E/8 G/10",
-            "#.......#",
-            "#G..G..G# G/10 G/10 G/10",
-            "#.......#",
-            "#.......#",
-            "#########",
-        ]));
+        assert_eq!(
+            grid.dump(),
+            wrap(vec![
+                "#########",
+                "#..G.G..# G/10 G/10",
+                "#...G...# G/6",
+                "#.G.E.G.# G/10 E/8 G/10",
+                "#.......#",
+                "#G..G..G# G/10 G/10 G/10",
+                "#.......#",
+                "#.......#",
+                "#########",
+            ])
+        );
 
         println!("\nstep 3:");
         let (es, gs) = simulation(&mut grid);
-        assert_eq!(grid.dump(), wrap(vec![
-            "#########",
-            "#.......#",
-            "#..GGG..# G/10 G/4 G/10",
-            "#..G.G..# G/10 G/10",
-            "#G..G...# G/10 G/10",
-            "#......G# G/10",
-            "#.......#",
-            "#.......#",
-            "#########",
-        ]));
+        assert_eq!(
+            grid.dump(),
+            wrap(vec![
+                "#########",
+                "#.......#",
+                "#..GGG..# G/10 G/4 G/10",
+                "#..G.G..# G/10 G/10",
+                "#G..G...# G/10 G/10",
+                "#......G# G/10",
+                "#.......#",
+                "#.......#",
+                "#########",
+            ])
+        );
         assert_eq!(es, 0);
         assert_eq!(gs, 8);
     }

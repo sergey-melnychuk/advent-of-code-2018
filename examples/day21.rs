@@ -54,7 +54,7 @@ pub fn main() {
 #[derive(Debug, Eq, PartialEq, Copy, Clone, Hash)]
 struct State {
     ip: usize,
-    rs: [usize; 6]
+    rs: [usize; 6],
 }
 
 impl State {
@@ -94,7 +94,7 @@ impl Code {
         let (a, b, c) = (self.a, self.b, self.c);
         let s = state.clone();
         match self.op.as_ref() {
-            "#ip"  => state.ip(a),
+            "#ip" => state.ip(a),
             "addr" => state.set(c, s.get(a) + s.get(b)),
             "addi" => state.set(c, s.get(a) + b),
             "mulr" => state.set(c, s.get(a) * s.get(b)),
@@ -105,13 +105,13 @@ impl Code {
             "bori" => state.set(c, s.get(a) | b),
             "setr" => state.set(c, s.get(a)),
             "seti" => state.set(c, a),
-            "gtrr" => state.set(c, if s.get(a) > s.get(b) {1} else {0}),
-            "gtri" => state.set(c, if s.get(a) > b {1} else {0}),
-            "gtir" => state.set(c, if a > s.get(b) {1} else {0}),
-            "eqrr" => state.set(c, if s.get(a) == s.get(b) {1} else {0}),
-            "eqri" => state.set(c, if s.get(a) == b {1} else {0}),
-            "eqir" => state.set(c, if a == s.get(b) {1} else {0}),
-            _  => ()
+            "gtrr" => state.set(c, if s.get(a) > s.get(b) { 1 } else { 0 }),
+            "gtri" => state.set(c, if s.get(a) > b { 1 } else { 0 }),
+            "gtir" => state.set(c, if a > s.get(b) { 1 } else { 0 }),
+            "eqrr" => state.set(c, if s.get(a) == s.get(b) { 1 } else { 0 }),
+            "eqri" => state.set(c, if s.get(a) == b { 1 } else { 0 }),
+            "eqir" => state.set(c, if a == s.get(b) { 1 } else { 0 }),
+            _ => (),
         }
     }
 }
@@ -162,7 +162,10 @@ fn process(codes: &[Code], mut state: State) -> State {
 
 fn get_input() -> Vec<String> {
     let stdin = std::io::stdin();
-    let lines = stdin.lock().lines().into_iter()
+    let lines = stdin
+        .lock()
+        .lines()
+        .into_iter()
         .map(Result::unwrap)
         .collect();
     lines
@@ -180,7 +183,12 @@ fn parse_codes(input: Vec<String>) -> (usize, Vec<Code>) {
         } else {
             let b: usize = split.next().unwrap().parse().unwrap();
             let c: usize = split.next().unwrap().parse().unwrap();
-            result.push(Code { op: op.to_string(), a, b, c });
+            result.push(Code {
+                op: op.to_string(),
+                a,
+                b,
+                c,
+            });
         }
     }
     (ip, result)

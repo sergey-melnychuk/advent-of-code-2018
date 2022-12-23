@@ -17,7 +17,7 @@ impl Pos {
 #[derive(Debug, Eq, PartialEq)]
 struct Rec {
     pos: Pos,
-    r: u64
+    r: u64,
 }
 
 impl Rec {
@@ -28,7 +28,10 @@ impl Rec {
 
 fn get_input() -> Vec<String> {
     let stdin = io::stdin();
-    let lines = stdin.lock().lines().into_iter()
+    let lines = stdin
+        .lock()
+        .lines()
+        .into_iter()
         .map(Result::unwrap)
         .collect();
     lines
@@ -36,7 +39,10 @@ fn get_input() -> Vec<String> {
 
 fn parse_input(lines: Vec<String>) -> Vec<Rec> {
     let re = Regex::new(r"pos=<(-?\d+),(-?\d+),(-?\d+)>, r=(\d+)").unwrap();
-    lines.into_iter().filter_map(|line| parse_rec(&line, &re)).collect()
+    lines
+        .into_iter()
+        .filter_map(|line| parse_rec(&line, &re))
+        .collect()
 }
 
 fn parse_rec(line: &str, regex: &Regex) -> Option<Rec> {
@@ -45,7 +51,10 @@ fn parse_rec(line: &str, regex: &Regex) -> Option<Rec> {
         let y: i64 = cap[2].parse().unwrap();
         let z: i64 = cap[3].parse().unwrap();
         let r: u64 = cap[4].parse().unwrap();
-        let rec = Rec { pos: Pos(x, y, z), r };
+        let rec = Rec {
+            pos: Pos(x, y, z),
+            r,
+        };
         return Some(rec);
     }
     return None;
@@ -91,11 +100,23 @@ mod tests {
             String::from("pos=<8924567,89634339,-10531384>, r=73102870"),
         ];
 
-        assert_eq!(parse_input(input), vec![
-            Rec { pos: Pos(77257099,50252980,47219056), r: 92361671 },
-            Rec { pos: Pos(53167623,26016086,28898789), r: 74188754 },
-            Rec { pos: Pos(8924567,89634339,-10531384), r: 73102870 },
-        ]);
+        assert_eq!(
+            parse_input(input),
+            vec![
+                Rec {
+                    pos: Pos(77257099, 50252980, 47219056),
+                    r: 92361671
+                },
+                Rec {
+                    pos: Pos(53167623, 26016086, 28898789),
+                    r: 74188754
+                },
+                Rec {
+                    pos: Pos(8924567, 89634339, -10531384),
+                    r: 73102870
+                },
+            ]
+        );
     }
 }
 

@@ -1,8 +1,8 @@
 use std::io;
 use std::io::prelude::*;
 
-use std::collections::VecDeque;
 use std::collections::HashSet;
+use std::collections::VecDeque;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 struct Pos {
@@ -21,21 +21,45 @@ impl Pos {
 
     fn step(&self, dir: char) -> Pos {
         match dir {
-            'N' => Pos { y: self.y - 2, ..*self },
-            'S' => Pos { y: self.y + 2, ..*self },
-            'E' => Pos { x: self.x + 2, ..*self },
-            'W' => Pos { x: self.x - 2, ..*self },
-            _ => *self
+            'N' => Pos {
+                y: self.y - 2,
+                ..*self
+            },
+            'S' => Pos {
+                y: self.y + 2,
+                ..*self
+            },
+            'E' => Pos {
+                x: self.x + 2,
+                ..*self
+            },
+            'W' => Pos {
+                x: self.x - 2,
+                ..*self
+            },
+            _ => *self,
         }
     }
 
     fn back(&self, dir: char) -> Pos {
         match dir {
-            'N' => Pos { y: self.y + 1, ..*self },
-            'S' => Pos { y: self.y - 1, ..*self },
-            'E' => Pos { x: self.x - 1, ..*self },
-            'W' => Pos { x: self.x + 1, ..*self },
-            _ => *self
+            'N' => Pos {
+                y: self.y + 1,
+                ..*self
+            },
+            'S' => Pos {
+                y: self.y - 1,
+                ..*self
+            },
+            'E' => Pos {
+                x: self.x - 1,
+                ..*self
+            },
+            'W' => Pos {
+                x: self.x + 1,
+                ..*self
+            },
+            _ => *self,
         }
     }
 }
@@ -58,7 +82,6 @@ fn traverse_chars(chars: &Vec<char>, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>
 fn traverse_nodes(nodes: &Vec<Node>, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>) -> Vec<Pos> {
     let mut res = Vec::new();
     for n in nodes {
-
         if n.nodes.is_empty() {
             let ps = traverse_chars(&n.chars, from, acc);
             for p in ps {
@@ -70,7 +93,6 @@ fn traverse_nodes(nodes: &Vec<Node>, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>
                 res.push(p);
             }
         }
-
     }
     res
 }
@@ -115,15 +137,13 @@ fn traverse_rec_tree(rec: &Rec, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>) -> 
             }
             last.push(p);
         }
-    } else
-    if !rec.list.is_empty() {
+    } else if !rec.list.is_empty() {
         last = from.clone();
         for r in &rec.list {
             let next = traverse_rec_tree(r, &last, acc);
             last = next;
         }
-    } else
-    if !rec.fork.is_empty() {
+    } else if !rec.fork.is_empty() {
         for r in &rec.fork {
             let mut next = traverse_rec_tree(r, from, acc);
             last.append(&mut next);
@@ -136,7 +156,7 @@ fn traverse_rec_tree(rec: &Rec, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>) -> 
 #[derive(Debug, Clone, Eq, PartialEq)]
 struct Node {
     chars: Vec<char>,
-    nodes: Vec<Node>
+    nodes: Vec<Node>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -148,19 +168,35 @@ struct Rec {
 
 impl Rec {
     fn new() -> Rec {
-        Rec { leaf: vec![], fork: vec![], list: vec![] }
+        Rec {
+            leaf: vec![],
+            fork: vec![],
+            list: vec![],
+        }
     }
 
     fn leaf(leaf: Vec<char>) -> Rec {
-        Rec { leaf, fork: vec![], list: vec![] }
+        Rec {
+            leaf,
+            fork: vec![],
+            list: vec![],
+        }
     }
 
     fn list(list: Vec<Rec>) -> Rec {
-        Rec { list, fork: vec![], leaf: vec![] }
+        Rec {
+            list,
+            fork: vec![],
+            leaf: vec![],
+        }
     }
 
     fn fork(fork: Vec<Rec>) -> Rec {
-        Rec { fork, leaf: vec![], list: vec![] }
+        Rec {
+            fork,
+            leaf: vec![],
+            list: vec![],
+        }
     }
 }
 
@@ -188,7 +224,7 @@ fn fetch_leaf(chars: &Vec<char>, at: usize) -> (Rec, usize) {
         //println!("leaf: i={} c={} rec={:?}", i, c, rec);
         match c {
             'N' | 'S' | 'E' | 'W' => rec.leaf.push(c),
-            _ => break
+            _ => break,
         }
         i += 1;
     }
@@ -206,18 +242,18 @@ fn fetch_list(chars: &Vec<char>, at: usize) -> (Rec, usize) {
                 let (r, j) = fetch_leaf(chars, i);
                 rec.list.push(r);
                 i = j;
-            },
+            }
             '(' => {
                 let (f, j) = fetch_fork(chars, i + 1);
                 rec.list.push(f);
                 i = j;
-            },
+            }
             '|' => {
                 //println!("Char '|' not expected in list at {}", i);
                 //i += 1;
                 break;
             }
-            _ => break
+            _ => break,
         }
     }
     (reduce_list(rec), i)
@@ -239,19 +275,19 @@ fn fetch_fork(chars: &Vec<char>, at: usize) -> (Rec, usize) {
                 let (r, j) = fetch_list(chars, i);
                 rec.fork.push(r);
                 i = j;
-            },
+            }
             '|' => {
                 let (l, j) = fetch_list(chars, i + 1);
                 rec.fork.push(l);
                 i = j;
-            },
+            }
             '(' => {
                 stack.push(rec);
                 rec = Rec::new();
                 let (f, j) = fetch_fork(chars, i + 1);
                 rec.fork.push(f);
                 i = j;
-            },
+            }
             ')' => {
                 if !stack.is_empty() {
                     rec = stack.pop().unwrap();
@@ -260,8 +296,8 @@ fn fetch_fork(chars: &Vec<char>, at: usize) -> (Rec, usize) {
                     i += 1;
                     break;
                 }
-            },
-            _ => break
+            }
+            _ => break,
         }
     }
     //println!("\tfork: rec={:?}", rec);
@@ -291,8 +327,7 @@ fn print_rec(rec: &Rec, lvl: usize, acc: &mut Vec<String>) {
         }
         s.push(')');
         acc.push(s);
-    } else
-    if !rec.list.is_empty() {
+    } else if !rec.list.is_empty() {
         {
             let mut s = String::new();
             for _ in 0..lvl {
@@ -312,8 +347,7 @@ fn print_rec(rec: &Rec, lvl: usize, acc: &mut Vec<String>) {
             s.push(')');
             acc.push(s);
         }
-    } else
-    if !rec.fork.is_empty() {
+    } else if !rec.fork.is_empty() {
         {
             let mut s = String::new();
             for _ in 0..lvl {
@@ -338,15 +372,24 @@ fn print_rec(rec: &Rec, lvl: usize, acc: &mut Vec<String>) {
 
 impl Node {
     fn new() -> Node {
-        Node { chars: Vec::new(), nodes: Vec::new() }
+        Node {
+            chars: Vec::new(),
+            nodes: Vec::new(),
+        }
     }
 
     fn leaf(chars: Vec<char>) -> Node {
-        Node { chars, nodes: Vec::new() }
+        Node {
+            chars,
+            nodes: Vec::new(),
+        }
     }
 
     fn node(nodes: Vec<Node>) -> Node {
-        Node { nodes, chars: Vec::new() }
+        Node {
+            nodes,
+            chars: Vec::new(),
+        }
     }
 
     fn is_leaf(&self) -> bool {
@@ -364,7 +407,7 @@ fn parse_chars(chars: &Vec<char>, offset: usize) -> (Node, usize) {
         match d {
             'N' | 'S' | 'E' | 'W' => {
                 node.chars.push(d);
-            },
+            }
             _ => {
                 next = i;
                 break;
@@ -411,7 +454,8 @@ fn parse_tree(chars: Vec<char>) -> Node {
     let mut stack: Vec<Node> = Vec::new();
     stack.push(root);
     let mut this = 1; // skip '^'
-    while this < chars.len()-1 { // skip '$'
+    while this < chars.len() - 1 {
+        // skip '$'
         //println!("{:?}", stack);
         let (node, next) = parse_chars(&chars, this);
         {
@@ -427,20 +471,22 @@ fn parse_tree(chars: Vec<char>) -> Node {
         let c = chars[next];
         //println!("next={} char={}", next, c);
         match c {
-            '|' => { this = next + 1; },
+            '|' => {
+                this = next + 1;
+            }
             '(' => {
                 // start of a new node
                 stack.push(Node::new());
                 this = next + 1;
-            },
+            }
             ')' => {
                 // end of a node
                 let node = stack.pop().unwrap();
                 let top: &mut Node = stack.last_mut().unwrap();
                 top.nodes.push(node);
                 this = next + 1;
-            },
-            _ => break // '$'
+            }
+            _ => break, // '$'
         }
     }
     stack.get(0).unwrap().to_owned()
@@ -451,23 +497,40 @@ struct Size {
     minx: isize,
     miny: isize,
     width: usize,
-    height: usize
+    height: usize,
 }
 
 impl Size {
     fn at(&self, p: Pos) -> Pos {
         Pos {
             x: p.x - self.minx,
-            y: p.y - self.miny
+            y: p.y - self.miny,
         }
     }
 }
 
 fn get_size(steps: &Vec<(char, Pos)>) -> Size {
-    fn max(a: isize, b: isize) -> isize { if a >= b {a} else {b} }
-    fn min(a: isize, b: isize) -> isize { if a <= b {a} else {b} }
+    fn max(a: isize, b: isize) -> isize {
+        if a >= b {
+            a
+        } else {
+            b
+        }
+    }
+    fn min(a: isize, b: isize) -> isize {
+        if a <= b {
+            a
+        } else {
+            b
+        }
+    }
 
-    let (mut minx, mut miny, mut maxx, mut maxy) = (std::isize::MAX, std::isize::MAX, std::isize::MIN, std::isize::MIN);
+    let (mut minx, mut miny, mut maxx, mut maxy) = (
+        std::isize::MAX,
+        std::isize::MAX,
+        std::isize::MIN,
+        std::isize::MIN,
+    );
 
     for s in steps {
         let (_, p) = s;
@@ -481,7 +544,7 @@ fn get_size(steps: &Vec<(char, Pos)>) -> Size {
         minx: minx - 1,
         miny: miny - 1,
         width: ((maxx - minx).abs() + 3) as usize,
-        height: ((maxy - miny).abs() + 3) as usize
+        height: ((maxy - miny).abs() + 3) as usize,
     }
 }
 
@@ -501,7 +564,7 @@ fn make_grid(size: &Size, steps: &Vec<(char, Pos)>) -> Vec<Vec<char>> {
             let c = match *d {
                 'N' | 'S' => '-',
                 'E' | 'W' => '|',
-                x => x
+                x => x,
             };
             grid[y][x] = c;
         }
@@ -521,7 +584,7 @@ fn bfs(grid: &Vec<Vec<char>>, at: Pos) -> Vec<Vec<usize>> {
         dist[p.y as usize][p.x as usize]
     }
 
-    fn set_cost(dist: &mut Vec<Vec<usize>>, p: Pos, d: usize){
+    fn set_cost(dist: &mut Vec<Vec<usize>>, p: Pos, d: usize) {
         dist[p.y as usize][p.x as usize] = d;
     }
 
@@ -565,7 +628,13 @@ fn bfs(grid: &Vec<Vec<char>>, at: Pos) -> Vec<Vec<usize>> {
 }
 
 fn max(grid: &Vec<Vec<char>>, dist: &Vec<Vec<usize>>) -> usize {
-    fn max(a: usize, b: usize) -> usize { if a >= b {a} else {b} }
+    fn max(a: usize, b: usize) -> usize {
+        if a >= b {
+            a
+        } else {
+            b
+        }
+    }
     let mut val = 0;
 
     for y in 0..grid.len() {
@@ -582,7 +651,9 @@ fn max(grid: &Vec<Vec<char>>, dist: &Vec<Vec<usize>>) -> usize {
 }
 
 fn count<F>(grid: &Vec<Vec<char>>, dist: &Vec<Vec<usize>>, f: F) -> usize
-    where F: Fn(usize) -> bool {
+where
+    F: Fn(usize) -> bool,
+{
     let mut n = 0;
     for y in 0..grid.len() {
         for x in 0..grid[y].len() {
@@ -627,10 +698,7 @@ mod tests {
                 Rec::leaf(vec!['W']),
                 Rec::list(vec![
                     Rec::leaf(vec!['E']),
-                    Rec::fork(vec![
-                        Rec::leaf(vec!['N']),
-                        Rec::leaf(vec!['S']),
-                    ]),
+                    Rec::fork(vec![Rec::leaf(vec!['N']), Rec::leaf(vec!['S'])]),
                 ]),
             ]),
             Rec::leaf(vec!['W', 'S']),
@@ -647,72 +715,81 @@ mod tests {
     #[test]
     fn test_parse_tree1() {
         let input: Vec<char> = "^NN(EE|WW)SS$".chars().collect();
-        assert_eq!(parse_tree(input), Node::node(vec![
-            Node::leaf(vec!['N', 'N']),
+        assert_eq!(
+            parse_tree(input),
             Node::node(vec![
-                Node::leaf(vec!['E', 'E']),
-                Node::leaf(vec!['W', 'W']),
-            ]),
-            Node::leaf(vec!['S', 'S']),
-        ]));
+                Node::leaf(vec!['N', 'N']),
+                Node::node(vec![Node::leaf(vec!['E', 'E']), Node::leaf(vec!['W', 'W']),]),
+                Node::leaf(vec!['S', 'S']),
+            ])
+        );
     }
 
     #[test]
     fn test_parse_tree2() {
         let input: Vec<char> = "^NEWS(SWEN|EWNS)$".chars().collect();
-        assert_eq!(parse_tree(input), Node::node(vec![
-            Node::leaf(vec!['N', 'E', 'W', 'S']),
+        assert_eq!(
+            parse_tree(input),
             Node::node(vec![
-                Node::leaf(vec!['S', 'W', 'E', 'N']),
-                Node::leaf(vec!['E', 'W', 'N', 'S']),
-            ]),
-        ]));
+                Node::leaf(vec!['N', 'E', 'W', 'S']),
+                Node::node(vec![
+                    Node::leaf(vec!['S', 'W', 'E', 'N']),
+                    Node::leaf(vec!['E', 'W', 'N', 'S']),
+                ]),
+            ])
+        );
     }
 
     #[test]
     fn test_parse_tree3_1() {
         let input: Vec<char> = "^NN(E|NEWS)SS$".chars().collect();
-        assert_eq!(parse_tree(input), Node::node(vec![
-            Node::leaf(vec!['N', 'N']),
+        assert_eq!(
+            parse_tree(input),
             Node::node(vec![
-                Node::leaf(vec!['E']),
-                Node::leaf(vec!['N', 'E', 'W', 'S']),
-            ]),
-            Node::leaf(vec!['S', 'S']),
-        ]));
+                Node::leaf(vec!['N', 'N']),
+                Node::node(vec![
+                    Node::leaf(vec!['E']),
+                    Node::leaf(vec!['N', 'E', 'W', 'S']),
+                ]),
+                Node::leaf(vec!['S', 'S']),
+            ])
+        );
     }
 
     #[test]
     fn test_parse_tree3_2() {
         let input: Vec<char> = "^NN(E|NEWS|S)SS$".chars().collect();
-        assert_eq!(parse_tree(input), Node::node(vec![
-            Node::leaf(vec!['N', 'N']),
+        assert_eq!(
+            parse_tree(input),
             Node::node(vec![
-                Node::leaf(vec!['E']),
-                Node::leaf(vec!['N', 'E', 'W', 'S']),
-                Node::leaf(vec!['S'])
-            ]),
-            Node::leaf(vec!['S', 'S']),
-        ]));
+                Node::leaf(vec!['N', 'N']),
+                Node::node(vec![
+                    Node::leaf(vec!['E']),
+                    Node::leaf(vec!['N', 'E', 'W', 'S']),
+                    Node::leaf(vec!['S'])
+                ]),
+                Node::leaf(vec!['S', 'S']),
+            ])
+        );
     }
 
     #[test]
     fn test_parse_tree3_3() {
         let input: Vec<char> = "^NN(E|NE(W|E)WS|S)SS$".chars().collect();
-        assert_eq!(parse_tree(input), Node::node(vec![
-            Node::leaf(vec!['N', 'N']),
+        assert_eq!(
+            parse_tree(input),
             Node::node(vec![
-                Node::leaf(vec!['E']),
-                Node::leaf(vec!['N', 'E']),
+                Node::leaf(vec!['N', 'N']),
                 Node::node(vec![
-                    Node::leaf(vec!['W']),
                     Node::leaf(vec!['E']),
+                    Node::leaf(vec!['N', 'E']),
+                    Node::node(vec![Node::leaf(vec!['W']), Node::leaf(vec!['E']),]),
+                    Node::leaf(vec!['W', 'S']),
+                    Node::leaf(vec!['S'])
                 ]),
-                Node::leaf(vec!['W', 'S']),
-                Node::leaf(vec!['S'])
-            ]),
-            Node::leaf(vec!['S', 'S']),
-        ]));
+                Node::leaf(vec!['S', 'S']),
+            ])
+        );
     }
 
     #[test]
@@ -727,17 +804,20 @@ mod tests {
 
         let z = Pos::zero();
         let ps = traverse(root);
-        assert_eq!(ps, vec![
-            ('X', z),
-            ('N', z.step('N')),
-            ('N', z.step('N').step('N')),
-            ('E', z.step('N').step('N').step('E')),
-            ('W', z.step('N').step('N').step('W')),
-            ('S', z.step('N').step('N').step('E').step('S')),
-            ('S', z.step('N').step('N').step('E').step('S').step('S')),
-            ('S', z.step('N').step('N').step('W').step('S')),
-            ('S', z.step('N').step('N').step('W').step('S').step('S')),
-        ]);
+        assert_eq!(
+            ps,
+            vec![
+                ('X', z),
+                ('N', z.step('N')),
+                ('N', z.step('N').step('N')),
+                ('E', z.step('N').step('N').step('E')),
+                ('W', z.step('N').step('N').step('W')),
+                ('S', z.step('N').step('N').step('E').step('S')),
+                ('S', z.step('N').step('N').step('E').step('S').step('S')),
+                ('S', z.step('N').step('N').step('W').step('S')),
+                ('S', z.step('N').step('N').step('W').step('S').step('S')),
+            ]
+        );
     }
 
     #[test]
@@ -745,26 +825,26 @@ mod tests {
         // NN(E|W)SS
         let rec = Rec::list(vec![
             Rec::leaf(vec!['N', 'N']),
-            Rec::fork(vec![
-                Rec::leaf(vec!['E']),
-                Rec::leaf(vec!['W']),
-            ]),
+            Rec::fork(vec![Rec::leaf(vec!['E']), Rec::leaf(vec!['W'])]),
             Rec::leaf(vec!['S', 'S']),
         ]);
 
         let z = Pos::zero();
         let ps = traverse_rec(&rec, z);
-        assert_eq!(ps, vec![
-            ('X', z),
-            ('N', z.step('N')),
-            ('N', z.step('N').step('N')),
-            ('E', z.step('N').step('N').step('E')),
-            ('W', z.step('N').step('N').step('W')),
-            ('S', z.step('N').step('N').step('E').step('S')),
-            ('S', z.step('N').step('N').step('E').step('S').step('S')),
-            ('S', z.step('N').step('N').step('W').step('S')),
-            ('S', z.step('N').step('N').step('W').step('S').step('S')),
-        ]);
+        assert_eq!(
+            ps,
+            vec![
+                ('X', z),
+                ('N', z.step('N')),
+                ('N', z.step('N').step('N')),
+                ('E', z.step('N').step('N').step('E')),
+                ('W', z.step('N').step('N').step('W')),
+                ('S', z.step('N').step('N').step('E').step('S')),
+                ('S', z.step('N').step('N').step('E').step('S').step('S')),
+                ('S', z.step('N').step('N').step('W').step('S')),
+                ('S', z.step('N').step('N').step('W').step('S').step('S')),
+            ]
+        );
     }
 
     #[test]
@@ -772,24 +852,29 @@ mod tests {
         let input = "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$".to_string();
         let (grid, d) = solve(input);
         assert_eq!(d, 18);
-        assert_eq!(dump(&grid), wrap(vec![
-            "###########",
-            "#.|.#.|.#.#",
-            "#-###-#-#-#",
-            "#.|.|.#.#.#",
-            "#-#####-#-#",
-            "#.#.#X|.#.#",
-            "#-#-#####-#",
-            "#.#.|.|.|.#",
-            "#-###-###-#",
-            "#.|.|.#.|.#",
-            "###########",
-        ]));
+        assert_eq!(
+            dump(&grid),
+            wrap(vec![
+                "###########",
+                "#.|.#.|.#.#",
+                "#-###-#-#-#",
+                "#.|.|.#.#.#",
+                "#-#####-#-#",
+                "#.#.#X|.#.#",
+                "#-#-#####-#",
+                "#.#.|.|.|.#",
+                "#-###-###-#",
+                "#.|.|.#.|.#",
+                "###########",
+            ])
+        );
     }
 
     #[test]
     fn test_solve2_fetch_tree() {
-        let input: Vec<char> = "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$".chars().collect();
+        let input: Vec<char> = "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$"
+            .chars()
+            .collect();
         println!("{:?}", input);
         let rec = fetch_tree(&input);
         let exp = Rec::list(vec![
@@ -801,10 +886,7 @@ mod tests {
                     Rec::fork(vec![
                         Rec::list(vec![
                             Rec::leaf(vec!['E', 'E', 'S', 'S']),
-                            Rec::fork(vec![
-                                Rec::leaf(vec!['W', 'N', 'S', 'E']),
-                                Rec::leaf(vec![]),
-                            ]),
+                            Rec::fork(vec![Rec::leaf(vec!['W', 'N', 'S', 'E']), Rec::leaf(vec![])]),
                             Rec::leaf(vec!['S', 'S', 'S']),
                         ]),
                         Rec::list(vec![
@@ -829,21 +911,24 @@ mod tests {
     fn test_solve2() {
         let input = "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$".to_string();
         let (grid, d) = solve(input);
-        assert_eq!(dump(&grid), wrap(vec![
-            "#############",
-            "#.|.|.|.|.|.#",
-            "#-#####-###-#",
-            "#.#.|.#.#.#.#",
-            "#-#-###-#-#-#",
-            "#.#.#.|.#.|.#",
-            "#-#-#-#####-#",
-            "#.#.#.#X|.#.#",
-            "#-#-#-###-#-#",
-            "#.|.#.|.#.#.#",
-            "###-#-###-#-#",
-            "#.|.#.|.|.#.#",
-            "#############",
-        ]));
+        assert_eq!(
+            dump(&grid),
+            wrap(vec![
+                "#############",
+                "#.|.|.|.|.|.#",
+                "#-#####-###-#",
+                "#.#.|.#.#.#.#",
+                "#-#-###-#-#-#",
+                "#.#.#.|.#.|.#",
+                "#-#-#-#####-#",
+                "#.#.#.#X|.#.#",
+                "#-#-#-###-#-#",
+                "#.|.#.|.#.#.#",
+                "###-#-###-#-#",
+                "#.|.#.|.|.#.#",
+                "#############",
+            ])
+        );
         assert_eq!(d, 23);
     }
 
@@ -851,23 +936,26 @@ mod tests {
     fn test_solve3() {
         let input = "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$".to_string();
         let (grid, d) = solve(input);
-        assert_eq!(dump(&grid), wrap(vec![
-            "###############",
-            "#.|.|.|.#.|.|.#",
-            "#-###-###-#-#-#",
-            "#.|.#.|.|.#.#.#",
-            "#-#########-#-#",
-            "#.#.|.|.|.|.#.#",
-            "#-#-#########-#",
-            "#.#.#.|X#.|.#.#",
-            "###-#-###-#-#-#",
-            "#.|.#.#.|.#.|.#",
-            "#-###-#####-###",
-            "#.|.#.|.|.#.#.#",
-            "#-#-#####-#-#-#",
-            "#.#.|.|.|.#.|.#",
-            "###############",
-        ]));
+        assert_eq!(
+            dump(&grid),
+            wrap(vec![
+                "###############",
+                "#.|.|.|.#.|.|.#",
+                "#-###-###-#-#-#",
+                "#.|.#.|.|.#.#.#",
+                "#-#########-#-#",
+                "#.#.|.|.|.|.#.#",
+                "#-#-#########-#",
+                "#.#.#.|X#.|.#.#",
+                "###-#-###-#-#-#",
+                "#.|.#.#.|.#.|.#",
+                "#-###-#####-###",
+                "#.|.#.|.|.#.#.#",
+                "#-#-#####-#-#-#",
+                "#.#.|.|.|.#.|.#",
+                "###############",
+            ])
+        );
         assert_eq!(d, 31);
     }
 }

@@ -1,13 +1,13 @@
 extern crate regex;
 
+use regex::Regex;
 use std::io;
 use std::io::prelude::*;
-use regex::Regex;
 
-use std::collections::HashSet;
-use std::collections::HashMap;
-use std::collections::BTreeSet;
 use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 fn get_input() -> Vec<String> {
     let mut items = Vec::new();
@@ -30,7 +30,7 @@ fn parse_line(line: &str) -> (char, char) {
 
 struct Graph {
     n: usize,
-    connectivity: Vec<Vec<usize>>
+    connectivity: Vec<Vec<usize>>,
 }
 
 impl Graph {
@@ -91,7 +91,13 @@ impl GraphTools {
         let mut temp: HashSet<usize> = HashSet::with_capacity(graph.n);
         let mut perm: HashSet<usize> = HashSet::with_capacity(graph.n);
 
-        fn visit(node: usize, temp: &mut HashSet<usize>, perm: &mut HashSet<usize>, graph: &Graph, out: &mut Vec<usize>) {
+        fn visit(
+            node: usize,
+            temp: &mut HashSet<usize>,
+            perm: &mut HashSet<usize>,
+            graph: &Graph,
+            out: &mut Vec<usize>,
+        ) {
             if !temp.contains(&node) && !perm.contains(&node) {
                 temp.insert(node);
                 for next in graph.adj(node) {
@@ -139,17 +145,24 @@ impl WorkerPool {
 }
 
 fn main() {
-    println!("{:?}", parse_line("Step S must be finished before step B can begin.")); // (S, B)
+    println!(
+        "{:?}",
+        parse_line("Step S must be finished before step B can begin.")
+    ); // (S, B)
 
     // 1. Build graph, 2. Apply Topological Sorting - NOPE!
     // 3. Seems like priority-queue based BFS works out instead
 
-    let raw: Vec<(char, char)> = get_input().iter()
-        .map(|x| parse_line(x))
-        .collect();
+    let raw: Vec<(char, char)> = get_input().iter().map(|x| parse_line(x)).collect();
 
-    let input: Vec<(usize, usize)> = (&raw).into_iter()
-        .map(|pair| (pair.0 as usize - 'A' as usize, pair.1 as usize - 'A' as usize))
+    let input: Vec<(usize, usize)> = (&raw)
+        .into_iter()
+        .map(|pair| {
+            (
+                pair.0 as usize - 'A' as usize,
+                pair.1 as usize - 'A' as usize,
+            )
+        })
         .collect();
 
     println!("input: {}", input.len());
@@ -166,7 +179,12 @@ fn main() {
     }
 
     for i in 0..graph.n {
-        println!("{} in={} out={}", (i as u8 + 'A' as u8) as char, graph.target(i).len(), graph.source(i).len());
+        println!(
+            "{} in={} out={}",
+            (i as u8 + 'A' as u8) as char,
+            graph.target(i).len(),
+            graph.source(i).len()
+        );
     }
 
     let mut roots: Vec<usize> = Vec::with_capacity(graph.n / 2);
@@ -218,7 +236,12 @@ fn main() {
         let step = *queue.iter().next().unwrap();
         let chr = (step as u8 + 'A' as u8) as char;
         queue.remove(&step);
-        println!("step={} queue={:?} blocked={}", chr, queue, blocked.contains_key(&step));
+        println!(
+            "step={} queue={:?} blocked={}",
+            chr,
+            queue,
+            blocked.contains_key(&step)
+        );
         if !blocked.contains_key(&step) {
             ordered.push(step);
 
@@ -294,7 +317,6 @@ fn main() {
                         }
                     }
                 }
-
             }
         }
         println!("done : {:?}", done);
@@ -322,5 +344,5 @@ fn main() {
         clock += 1;
     }
 
-    println!("{}", clock-1);
+    println!("{}", clock - 1);
 }
