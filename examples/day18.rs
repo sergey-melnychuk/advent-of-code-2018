@@ -18,11 +18,6 @@ impl Grid {
         Grid { chars, rows, cols }
     }
 
-    fn dump(&self) -> Vec<String> {
-        let chars = self.chars.clone();
-        chars.into_iter().map(|cs| cs.iter().collect()).collect()
-    }
-
     fn count<F>(&self, f: F) -> usize
     where
         F: Fn(char) -> bool,
@@ -60,13 +55,9 @@ impl Grid {
         let (rs, cs) = (self.rows as isize, self.cols as isize);
         cells
             .into_iter()
-            .filter_map(|p| {
-                let (x, y) = p;
-                if x >= 0 && y >= 0 && x < cs && y < rs {
-                    Some(p)
-                } else {
-                    None
-                }
+            .filter(|p| {
+                let (x, y) = *p;
+                x >= 0 && y >= 0 && x < cs && y < rs
             })
             .map(|p| {
                 let (x, y) = p;

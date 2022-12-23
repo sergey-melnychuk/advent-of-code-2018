@@ -46,7 +46,7 @@ fn parse_input(lines: Vec<String>) -> Vec<Rec> {
 }
 
 fn parse_rec(line: &str, regex: &Regex) -> Option<Rec> {
-    for cap in regex.captures_iter(line) {
+    if let Some(cap) = regex.captures_iter(line).next() {
         let x: i64 = cap[1].parse().unwrap();
         let y: i64 = cap[2].parse().unwrap();
         let z: i64 = cap[3].parse().unwrap();
@@ -60,7 +60,7 @@ fn parse_rec(line: &str, regex: &Regex) -> Option<Rec> {
     None
 }
 
-fn find_strongest(recs: &Vec<Rec>) -> usize {
+fn find_strongest(recs: &[Rec]) -> usize {
     let mut max: u64 = 0;
     let mut idx: usize = 0;
     for (i, rec) in recs.iter().enumerate() {
@@ -72,7 +72,7 @@ fn find_strongest(recs: &Vec<Rec>) -> usize {
     idx
 }
 
-fn find_in_range(idx: usize, recs: &Vec<Rec>) -> usize {
+fn find_in_range(idx: usize, recs: &[Rec]) -> usize {
     let mut count = 0;
     let strongest = &recs[idx];
     for (_i, rec) in recs.iter().enumerate() {
@@ -83,7 +83,7 @@ fn find_in_range(idx: usize, recs: &Vec<Rec>) -> usize {
     count
 }
 
-fn solve1(recs: &Vec<Rec>) -> usize {
+fn solve1(recs: &[Rec]) -> usize {
     let idx = find_strongest(recs);
     find_in_range(idx, recs)
 }

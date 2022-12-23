@@ -2,8 +2,6 @@ use std::fmt::Debug;
 use std::io;
 use std::io::prelude::*;
 
-
-
 fn hash(value: [u8; 5]) -> usize {
     let mut result: usize = 0;
     for x in value.iter() {
@@ -42,14 +40,10 @@ fn parse_record(rec: &str) -> ([u8; 5], u8) {
     (bits, val)
 }
 
-fn parse_records(records: Vec<&str>) -> Vec<([u8; 5], u8)> {
-    records.into_iter().map(parse_record).collect()
-}
-
 fn parse_state(line: &str) -> Vec<u8> {
     line.chars()
         .into_iter()
-        .map(|c| if c == '#' { 1 } else { 0 })
+        .map(|c| u8::from(c == '#'))
         .collect()
 }
 
@@ -132,8 +126,8 @@ fn trim(items: Vec<u8>, offset: isize) -> (Vec<u8>, isize) {
     let mut off = offset;
     let mut prefix_nonzero: usize = 0;
     let mut suffix_nonzero: usize = 0;
-    for i in 0..items.len() {
-        if items[i] > 0 {
+    for (i, item) in items.iter().enumerate() {
+        if *item > 0 {
             if prefix_nonzero == 0 {
                 prefix_nonzero = i;
             }

@@ -48,7 +48,7 @@ impl Node {
     }
 }
 
-fn fetch_node(id: usize, offset: usize, stream: &Vec<usize>) -> (Node, usize) {
+fn fetch_node(id: usize, offset: usize, stream: &[usize]) -> (Node, usize) {
     let n_children = *stream.get(offset).unwrap();
     let n_metadata = *stream.get(offset + 1).unwrap();
     let mut node = Node {
@@ -65,14 +65,14 @@ fn fetch_node(id: usize, offset: usize, stream: &Vec<usize>) -> (Node, usize) {
     (node, next)
 }
 
-fn fetch_metadata(node: &mut Node, offset: usize, stream: &Vec<usize>) -> usize {
+fn fetch_metadata(node: &mut Node, offset: usize, stream: &[usize]) -> usize {
     for i in offset..(offset + node.n_metadata) {
         node.metadata.push(*stream.get(i).unwrap());
     }
     offset + node.n_metadata
 }
 
-fn fetch_all(stream: &Vec<usize>) -> Vec<Node> {
+fn fetch_all(stream: &[usize]) -> Vec<Node> {
     let mut tree: Vec<Node> = Vec::new();
     let mut stack: Vec<usize> = Vec::new();
 
@@ -117,7 +117,7 @@ fn fetch_all(stream: &Vec<usize>) -> Vec<Node> {
     tree
 }
 
-fn code(tree: &Vec<Node>, id: usize) -> usize {
+fn code(tree: &[Node], id: usize) -> usize {
     let mut result: usize = 0;
     let mut queue: VecDeque<usize> = VecDeque::new();
     queue.push_back(id);

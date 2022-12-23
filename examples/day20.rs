@@ -15,10 +15,6 @@ impl Pos {
         Pos { x: 0, y: 0 }
     }
 
-    fn new(x: isize, y: isize) -> Pos {
-        Pos { x, y }
-    }
-
     fn step(&self, dir: char) -> Pos {
         match dir {
             'N' => Pos {
@@ -64,67 +60,14 @@ impl Pos {
     }
 }
 
-fn traverse_chars(chars: &Vec<char>, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>) -> Vec<Pos> {
-    let mut res = Vec::new();
-    for f in from {
-        let mut p = *f;
-        for c in chars {
-            //println!("chars: c={} p={:?}", *c, p);
-            let n = p.step(*c);
-            acc.push((*c, n));
-            p = n;
-        }
-        res.push(p);
-    }
-    res
-}
-
-fn traverse_nodes(nodes: &Vec<Node>, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>) -> Vec<Pos> {
-    let mut res = Vec::new();
-    for n in nodes {
-        if n.nodes.is_empty() {
-            let ps = traverse_chars(&n.chars, from, acc);
-            for p in ps {
-                res.push(p);
-            }
-        } else {
-            let ps = traverse_nodes(&n.nodes, from, acc);
-            for p in ps {
-                res.push(p);
-            }
-        }
-    }
-    res
-}
-
-fn traverse(root: Node) -> Vec<(char, Pos)> {
-    let pos = Pos::zero();
-
-    let mut last = vec![pos];
-    let mut acc: Vec<(char, Pos)> = Vec::new();
-    acc.push(('X', pos));
-
-    for node in root.nodes {
-        if node.nodes.is_empty() {
-            let next = traverse_chars(&node.chars, &last, &mut acc);
-            last = next;
-        } else {
-            let next = traverse_nodes(&node.nodes, &last, &mut acc);
-            last = next;
-        }
-    }
-
-    acc
-}
-
 fn traverse_rec(rec: &Rec, at: Pos) -> Vec<(char, Pos)> {
     let mut acc = Vec::new();
     acc.push(('X', at));
-    traverse_rec_tree(rec, &vec![at], &mut acc);
+    traverse_rec_tree(rec, &[at], &mut acc);
     acc
 }
 
-fn traverse_rec_tree(rec: &Rec, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>) -> Vec<Pos> {
+fn traverse_rec_tree(rec: &Rec, from: &[Pos], acc: &mut Vec<(char, Pos)>) -> Vec<Pos> {
     let mut last: Vec<Pos> = Vec::new();
 
     if !rec.leaf.is_empty() {
@@ -138,7 +81,7 @@ fn traverse_rec_tree(rec: &Rec, from: &Vec<Pos>, acc: &mut Vec<(char, Pos)>) -> 
             last.push(p);
         }
     } else if !rec.list.is_empty() {
-        last = from.clone();
+        last = from.to_vec();
         for r in &rec.list {
             let next = traverse_rec_tree(r, &last, acc);
             last = next;
@@ -174,30 +117,6 @@ impl Rec {
             list: vec![],
         }
     }
-
-    fn leaf(leaf: Vec<char>) -> Rec {
-        Rec {
-            leaf,
-            fork: vec![],
-            list: vec![],
-        }
-    }
-
-    fn list(list: Vec<Rec>) -> Rec {
-        Rec {
-            list,
-            fork: vec![],
-            leaf: vec![],
-        }
-    }
-
-    fn fork(fork: Vec<Rec>) -> Rec {
-        Rec {
-            fork,
-            leaf: vec![],
-            list: vec![],
-        }
-    }
 }
 
 fn reduce_list(rec: Rec) -> Rec {
@@ -216,7 +135,7 @@ fn reduce_fork(rec: Rec) -> Rec {
     }
 }
 
-fn fetch_leaf(chars: &Vec<char>, at: usize) -> (Rec, usize) {
+fn fetch_leaf(chars: &[char], at: usize) -> (Rec, usize) {
     let mut rec: Rec = Rec::new();
     let mut i = at;
     loop {
@@ -231,7 +150,7 @@ fn fetch_leaf(chars: &Vec<char>, at: usize) -> (Rec, usize) {
     (rec, i)
 }
 
-fn fetch_list(chars: &Vec<char>, at: usize) -> (Rec, usize) {
+fn fetch_list(chars: &[char], at: usize) -> (Rec, usize) {
     let mut rec: Rec = Rec::new();
     let mut i = at;
     loop {
@@ -259,7 +178,7 @@ fn fetch_list(chars: &Vec<char>, at: usize) -> (Rec, usize) {
     (reduce_list(rec), i)
 }
 
-fn fetch_fork(chars: &Vec<char>, at: usize) -> (Rec, usize) {
+fn fetch_fork(chars: &[char], at: usize) -> (Rec, usize) {
     let mut rec: Rec = Rec::new();
     let mut i = at;
 
@@ -304,192 +223,9 @@ fn fetch_fork(chars: &Vec<char>, at: usize) -> (Rec, usize) {
     (reduce_fork(rec), i)
 }
 
-fn fetch_tree(chars: &Vec<char>) -> Rec {
+fn fetch_tree(chars: &[char]) -> Rec {
     let (rec, _) = fetch_list(chars, 1); // skip '^' at index 0
     rec
-}
-
-fn print_rec_tree(rec: &Rec) -> Vec<String> {
-    let mut acc = Vec::new();
-    print_rec(rec, 0, &mut acc);
-    acc
-}
-
-fn print_rec(rec: &Rec, lvl: usize, acc: &mut Vec<String>) {
-    if !rec.leaf.is_empty() {
-        let mut s = String::new();
-        for _ in 0..lvl {
-            s.push(' ');
-        }
-        s.push_str("Leaf(");
-        for c in &rec.leaf {
-            s.push(*c);
-        }
-        s.push(')');
-        acc.push(s);
-    } else if !rec.list.is_empty() {
-        {
-            let mut s = String::new();
-            for _ in 0..lvl {
-                s.push(' ');
-            }
-            s.push_str("List(");
-            acc.push(s);
-        }
-        for r in &rec.list {
-            print_rec(r, lvl + 1, acc);
-        }
-        {
-            let mut s = String::new();
-            for _ in 0..lvl {
-                s.push(' ');
-            }
-            s.push(')');
-            acc.push(s);
-        }
-    } else if !rec.fork.is_empty() {
-        {
-            let mut s = String::new();
-            for _ in 0..lvl {
-                s.push(' ');
-            }
-            s.push_str("Fork(");
-            acc.push(s);
-        }
-        for r in &rec.fork {
-            print_rec(r, lvl + 1, acc);
-        }
-        {
-            let mut s = String::new();
-            for _ in 0..lvl {
-                s.push(' ');
-            }
-            s.push(')');
-            acc.push(s);
-        }
-    }
-}
-
-impl Node {
-    fn new() -> Node {
-        Node {
-            chars: Vec::new(),
-            nodes: Vec::new(),
-        }
-    }
-
-    fn leaf(chars: Vec<char>) -> Node {
-        Node {
-            chars,
-            nodes: Vec::new(),
-        }
-    }
-
-    fn node(nodes: Vec<Node>) -> Node {
-        Node {
-            nodes,
-            chars: Vec::new(),
-        }
-    }
-
-    fn is_leaf(&self) -> bool {
-        self.nodes.is_empty() && !self.chars.is_empty()
-    }
-}
-
-// Parses consecutive row of characters,
-// returns first index of following '(' / '|' / ')'
-fn parse_chars(chars: &Vec<char>, offset: usize) -> (Node, usize) {
-    let mut node: Node = Node::new();
-    let mut next: usize = chars.len();
-    for i in offset..chars.len() {
-        let d = chars[i];
-        match d {
-            'N' | 'S' | 'E' | 'W' => {
-                node.chars.push(d);
-            }
-            _ => {
-                next = i;
-                break;
-            }
-        }
-    }
-
-    (node, next)
-}
-
-fn reduce_node(node: Node) -> Node {
-    if node.nodes.len() == 1 {
-        node.nodes[0].to_owned()
-    } else {
-        node
-    }
-}
-
-fn print_tree(root: &Node) -> Vec<String> {
-    let mut acc = Vec::new();
-    print_node(root, 0, &mut acc);
-    acc
-}
-
-fn print_node(node: &Node, lvl: usize, acc: &mut Vec<String>) {
-    let mut s = String::new();
-    for _i in 0..lvl {
-        s.push(' ');
-    }
-    if node.is_leaf() {
-        for c in &node.chars {
-            s.push(*c);
-        }
-        acc.push(s);
-    } else {
-        for n in &node.nodes {
-            print_node(n, lvl + 1, acc);
-        }
-    }
-}
-
-fn parse_tree(chars: Vec<char>) -> Node {
-    let root = Node::new();
-    let mut stack: Vec<Node> = Vec::new();
-    stack.push(root);
-    let mut this = 1; // skip '^'
-    while this < chars.len() - 1 {
-        // skip '$'
-        //println!("{:?}", stack);
-        let (node, next) = parse_chars(&chars, this);
-        {
-            let top: &mut Node = stack.last_mut().unwrap();
-            //println!("top={:?} node={:?}", *top, node);
-            top.nodes.push(node);
-        }
-
-        if next >= chars.len() {
-            break;
-        }
-
-        let c = chars[next];
-        //println!("next={} char={}", next, c);
-        match c {
-            '|' => {
-                this = next + 1;
-            }
-            '(' => {
-                // start of a new node
-                stack.push(Node::new());
-                this = next + 1;
-            }
-            ')' => {
-                // end of a node
-                let node = stack.pop().unwrap();
-                let top: &mut Node = stack.last_mut().unwrap();
-                top.nodes.push(node);
-                this = next + 1;
-            }
-            _ => break, // '$'
-        }
-    }
-    stack.get(0).unwrap().to_owned()
 }
 
 #[derive(Debug)]
@@ -509,7 +245,7 @@ impl Size {
     }
 }
 
-fn get_size(steps: &Vec<(char, Pos)>) -> Size {
+fn get_size(steps: &[(char, Pos)]) -> Size {
     fn max(a: isize, b: isize) -> isize {
         if a >= b {
             a
@@ -548,7 +284,7 @@ fn get_size(steps: &Vec<(char, Pos)>) -> Size {
     }
 }
 
-fn make_grid(size: &Size, steps: &Vec<(char, Pos)>) -> Vec<Vec<char>> {
+fn make_grid(size: &Size, steps: &[(char, Pos)]) -> Vec<Vec<char>> {
     let mut grid = vec![vec!['#'; size.width]; size.height];
     for s in steps {
         let (d, p) = s;
@@ -572,24 +308,24 @@ fn make_grid(size: &Size, steps: &Vec<(char, Pos)>) -> Vec<Vec<char>> {
     grid
 }
 
-fn bfs(grid: &Vec<Vec<char>>, at: Pos) -> Vec<Vec<usize>> {
+fn bfs(grid: &[Vec<char>], at: Pos) -> Vec<Vec<usize>> {
     let rows = grid.len();
     let cols = grid[0].len();
 
-    fn get(grid: &Vec<Vec<char>>, p: Pos) -> char {
+    fn get(grid: &[Vec<char>], p: Pos) -> char {
         grid[p.y as usize][p.x as usize]
     }
 
-    fn get_cost(dist: &Vec<Vec<usize>>, p: Pos) -> usize {
+    fn get_cost(dist: &[Vec<usize>], p: Pos) -> usize {
         dist[p.y as usize][p.x as usize]
     }
 
-    fn set_cost(dist: &mut Vec<Vec<usize>>, p: Pos, d: usize) {
+    fn set_cost(dist: &mut [Vec<usize>], p: Pos, d: usize) {
         dist[p.y as usize][p.x as usize] = d;
     }
 
-    fn adj(grid: &Vec<Vec<char>>, p: Pos) -> Vec<Pos> {
-        fn check(grid: &Vec<Vec<char>>, p: Pos, d: char, w: char, acc: &mut Vec<Pos>) {
+    fn adj(grid: &[Vec<char>], p: Pos) -> Vec<Pos> {
+        fn check(grid: &[Vec<char>], p: Pos, d: char, w: char, acc: &mut Vec<Pos>) {
             if get(grid, p.step(d).back(d)) == w {
                 acc.push(p.step(d));
             }
@@ -627,7 +363,7 @@ fn bfs(grid: &Vec<Vec<char>>, at: Pos) -> Vec<Vec<usize>> {
     dist
 }
 
-fn max(grid: &Vec<Vec<char>>, dist: &Vec<Vec<usize>>) -> usize {
+fn max(grid: &[Vec<char>], dist: &[Vec<usize>]) -> usize {
     fn max(a: usize, b: usize) -> usize {
         if a >= b {
             a
@@ -650,7 +386,7 @@ fn max(grid: &Vec<Vec<char>>, dist: &Vec<Vec<usize>>) -> usize {
     val
 }
 
-fn count<F>(grid: &Vec<Vec<char>>, dist: &Vec<Vec<usize>>, f: F) -> usize
+fn count<F>(grid: &[Vec<char>], dist: &[Vec<usize>], f: F) -> usize
 where
     F: Fn(usize) -> bool,
 {
@@ -669,7 +405,7 @@ where
     n
 }
 
-fn dump(grid: &Vec<Vec<char>>) -> Vec<String> {
+fn dump(grid: &[Vec<char>]) -> Vec<String> {
     grid.iter().map(|row| row.iter().collect()).collect()
 }
 
@@ -963,7 +699,7 @@ mod tests {
 fn solve(input: String) -> (Vec<Vec<char>>, usize, usize) {
     // let tree = parse_tree(input.chars().collect());
     // let cells = traverse(tree);
-    let rec = fetch_tree(&input.chars().collect());
+    let rec = fetch_tree(&input.chars().collect::<Vec<_>>());
     let cells = traverse_rec(&rec, Pos::zero());
     println!("cells: {}", cells.len());
 

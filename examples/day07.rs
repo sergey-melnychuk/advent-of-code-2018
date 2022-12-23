@@ -85,7 +85,7 @@ impl GraphTools {
         }
     }
 
-    fn topological(graph: &Graph, roots: &Vec<usize>) -> Vec<usize> {
+    fn topological(graph: &Graph, roots: &[usize]) -> Vec<usize> {
         let mut ordered = Vec::with_capacity(graph.n);
 
         let mut temp: HashSet<usize> = HashSet::with_capacity(graph.n);
@@ -106,7 +106,7 @@ impl GraphTools {
                 perm.insert(node);
                 out.push(node);
             }
-        };
+        }
 
         let mut other: Vec<usize> = Vec::with_capacity(graph.n);
         for i in 0..graph.n {
@@ -130,17 +130,6 @@ impl GraphTools {
         }
 
         ordered
-    }
-}
-
-struct WorkerPool {
-    n: usize,
-    ticks: usize,
-}
-
-impl WorkerPool {
-    fn new(n: usize) -> WorkerPool {
-        WorkerPool { n, ticks: 0 }
     }
 }
 

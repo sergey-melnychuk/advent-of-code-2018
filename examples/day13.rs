@@ -115,10 +115,10 @@ struct Cart {
 impl Cart {
     fn go(&self, cell: char) -> Option<Cart> {
         step(self.pos.x, self.pos.y, self.dir, cell, self.turn).map(|((x, y), d, t)| Cart {
-                pos: Pos { x, y },
-                dir: d,
-                turn: t,
-            })
+            pos: Pos { x, y },
+            dir: d,
+            turn: t,
+        })
     }
 }
 

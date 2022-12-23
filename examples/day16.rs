@@ -107,37 +107,37 @@ fn seti(a: usize, _: usize, c: usize, regs: &[usize; 4]) -> [usize; 4] {
 
 fn gtir(a: usize, b: usize, c: usize, regs: &[usize; 4]) -> [usize; 4] {
     let mut out = [regs[0], regs[1], regs[2], regs[3]];
-    out[c] = if a > regs[b] { 1 } else { 0 };
+    out[c] = usize::from(a > regs[b]);
     out
 }
 
 fn gtri(a: usize, b: usize, c: usize, regs: &[usize; 4]) -> [usize; 4] {
     let mut out = [regs[0], regs[1], regs[2], regs[3]];
-    out[c] = if regs[a] > b { 1 } else { 0 };
+    out[c] = usize::from(a > regs[b]);
     out
 }
 
 fn gtrr(a: usize, b: usize, c: usize, regs: &[usize; 4]) -> [usize; 4] {
     let mut out = [regs[0], regs[1], regs[2], regs[3]];
-    out[c] = if regs[a] > regs[b] { 1 } else { 0 };
+    out[c] = usize::from(regs[a] > regs[b]);
     out
 }
 
 fn eqir(a: usize, b: usize, c: usize, regs: &[usize; 4]) -> [usize; 4] {
     let mut out = [regs[0], regs[1], regs[2], regs[3]];
-    out[c] = if a == regs[b] { 1 } else { 0 };
+    out[c] = usize::from(a == regs[b]);
     out
 }
 
 fn eqri(a: usize, b: usize, c: usize, regs: &[usize; 4]) -> [usize; 4] {
     let mut out = [regs[0], regs[1], regs[2], regs[3]];
-    out[c] = if regs[a] == b { 1 } else { 0 };
+    out[c] = usize::from(regs[a] == b);
     out
 }
 
 fn eqrr(a: usize, b: usize, c: usize, regs: &[usize; 4]) -> [usize; 4] {
     let mut out = [regs[0], regs[1], regs[2], regs[3]];
-    out[c] = if regs[a] == regs[b] { 1 } else { 0 };
+    out[c] = usize::from(regs[a] == regs[b]);
     out
 }
 
@@ -242,7 +242,7 @@ fn get_input() -> String {
     buffer
 }
 
-fn parse_records(input: &String) -> Vec<Record> {
+fn parse_records(input: &str) -> Vec<Record> {
     let re = Regex::new(r"Before: \[(\d+), (\d+), (\d+), (\d+)]\n(\d+) (\d+) (\d+) (\d+)\nAfter:  \[(\d+), (\d+), (\d+), (\d+)]\n?").unwrap();
     let mut result: Vec<Record> = Vec::new();
 
@@ -274,7 +274,7 @@ fn parse_records(input: &String) -> Vec<Record> {
     result
 }
 
-fn parse_codes(input: &String) -> Vec<Code> {
+fn parse_codes(input: &str) -> Vec<Code> {
     let mut result = Vec::new();
     let mut split = input.split("\n\n\n");
     split.next();
@@ -293,7 +293,7 @@ fn parse_codes(input: &String) -> Vec<Code> {
     result
 }
 
-fn part1(recs: &Vec<Record>) -> usize {
+fn part1(recs: &[Record]) -> usize {
     let mut n = 0;
     for rec in recs {
         if nfits(rec).len() >= 3 {
@@ -303,7 +303,7 @@ fn part1(recs: &Vec<Record>) -> usize {
     n
 }
 
-fn fitness(recs: &Vec<Record>) -> HashMap<usize, HashSet<usize>> {
+fn fitness(recs: &[Record]) -> HashMap<usize, HashSet<usize>> {
     let mut map = HashMap::new();
     for rec in recs {
         map.entry(rec.code.op).or_insert_with(HashSet::new);

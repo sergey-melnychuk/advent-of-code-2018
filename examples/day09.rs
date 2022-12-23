@@ -22,22 +22,6 @@ fn get_input(line: &str) -> Input {
     Input { players, marble }
 }
 
-fn seek(marbles: &Vec<usize>, current: usize, offset: i64) -> usize {
-    let n = marbles.len();
-    if n == 0 {
-        0
-    } else if n == 1 {
-        1
-    } else {
-        let i = (current as i64 + offset + n as i64) as usize % n;
-        if i > 0 {
-            i
-        } else {
-            n
-        }
-    }
-}
-
 fn play(input: &Input) -> Vec<usize> {
     let mut scores = vec![0; input.players];
 
@@ -74,7 +58,7 @@ fn play(input: &Input) -> Vec<usize> {
     scores
 }
 
-fn max(scores: &Vec<usize>) -> usize {
+fn max(scores: &[usize]) -> usize {
     let mut max: usize = 0;
     for s in scores {
         if *s > max {
@@ -86,7 +70,6 @@ fn max(scores: &Vec<usize>) -> usize {
 
 #[derive(Debug)]
 struct DLList {
-    cap: usize,
     index: usize,
     current: usize,
     data: Vec<usize>,    // data[0] = default value?
@@ -97,7 +80,6 @@ struct DLList {
 impl DLList {
     fn new(cap: usize) -> DLList {
         DLList {
-            cap,
             index: 0,
             current: 0,
             data: vec![0; cap + 1],
@@ -192,34 +174,6 @@ impl DLList {
 
         self.current = next;
         value
-    }
-
-    fn reduce<F, ACC>(&self, zero: ACC, f: F) -> ACC
-    where
-        F: Fn(ACC, usize) -> ACC,
-    {
-        let head: usize = *self.forward.first().unwrap();
-        //println!("reduce: head={}", head);
-
-        let mut next = head;
-        let mut acc: ACC = zero;
-        while next != 0 {
-            //println!("reduce: next={}", next);
-            let current: usize = *self.data.get(next).unwrap();
-            let reduced = f(acc, current);
-            acc = reduced;
-            next = *self.forward.get(next).unwrap();
-        }
-        acc
-    }
-
-    fn vec(&self) -> Vec<usize> {
-        let mut vec: Vec<usize> = Vec::with_capacity(self.cap);
-        self.reduce(&mut vec, |acc: &mut Vec<usize>, x: usize| {
-            acc.push(x);
-            acc
-        });
-        vec
     }
 }
 

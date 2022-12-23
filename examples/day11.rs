@@ -7,7 +7,7 @@ fn fuel(x: i64, y: i64, nr: i64) -> i64 {
     hundreds_digit - 5
 }
 
-fn conv(x: usize, y: usize, size: usize, mat: &Vec<Vec<i64>>) -> i64 {
+fn conv(x: usize, y: usize, size: usize, mat: &[Vec<i64>]) -> i64 {
     let mut sum = 0;
     for i in x..(x + size) {
         for j in y..(y + size) {
@@ -17,7 +17,7 @@ fn conv(x: usize, y: usize, size: usize, mat: &Vec<Vec<i64>>) -> i64 {
     sum
 }
 
-fn window(row: &Vec<i64>, size: usize) -> Vec<i64> {
+fn window(row: &[i64], size: usize) -> Vec<i64> {
     let mut window: Vec<i64> = vec![0; row.len() - size + 1];
     let mut first = 0;
     for i in 0..size {
@@ -32,7 +32,7 @@ fn window(row: &Vec<i64>, size: usize) -> Vec<i64> {
     window
 }
 
-fn transpose(mat: &Vec<Vec<i64>>) -> Vec<Vec<i64>> {
+fn transpose(mat: &[Vec<i64>]) -> Vec<Vec<i64>> {
     let rows = mat.len();
     let cols = mat.get(0).unwrap().len();
     let mut result = vec![vec![0; rows]; cols];
@@ -44,7 +44,7 @@ fn transpose(mat: &Vec<Vec<i64>>) -> Vec<Vec<i64>> {
     result
 }
 
-fn window2d(mat: &Vec<Vec<i64>>, hsize: usize, vsize: usize) -> Vec<Vec<i64>> {
+fn window2d(mat: &[Vec<i64>], hsize: usize, vsize: usize) -> Vec<Vec<i64>> {
     let mut hwindow: Vec<Vec<i64>> = Vec::new();
     for i in 0..mat.len() {
         hwindow.push(window(mat.get(i).unwrap(), hsize));

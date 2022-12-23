@@ -8,7 +8,7 @@ struct Pos {
 // y=0 -> x * 16807
 // x=0 -> y * 48271
 // [x-1] * [y-1] (erosion levels)
-fn geo_index(grid: &Vec<Vec<u64>>, x: usize, y: usize) -> u64 {
+fn geo_index(grid: &[Vec<u64>], x: usize, y: usize) -> u64 {
     match (x, y) {
         (0, 0) => 0_u64,
         (x, 0) => (x as u64) * 16807,
@@ -36,11 +36,11 @@ fn make_grid(width: usize, height: usize, depth: u64) -> Vec<Vec<u64>> {
     grid
 }
 
-fn sum(grid: &Vec<Vec<u64>>, tx: usize, ty: usize) -> u64 {
+fn sum(grid: &[Vec<u64>], tx: usize, ty: usize) -> u64 {
     let mut result = 0;
-    for y in 0..grid.len() {
-        for x in 0..grid[y].len() {
-            result += grid[y][x] % 3;
+    for row in grid {
+        for val in row {
+            result += val % 3;
         }
     }
     result -= grid[ty][tx] % 3;

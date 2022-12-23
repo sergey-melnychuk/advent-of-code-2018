@@ -9,9 +9,7 @@ fn digits(number: usize) -> Vec<usize> {
 fn answer(mut state: Vec<usize>, count: usize, query: usize) -> Vec<usize> {
     let mut fst = 0;
     let mut snd = 1;
-    let mut len = state.len();
 
-    let mut iter = 0;
     loop {
         let one = state[fst];
         let two = state[snd];
@@ -20,7 +18,7 @@ fn answer(mut state: Vec<usize>, count: usize, query: usize) -> Vec<usize> {
         for d in ds {
             state.push(d);
         }
-        len = state.len();
+        let len = state.len();
 
         fst = (fst + one + 1) % len;
         snd = (snd + two + 1) % len;
@@ -28,25 +26,22 @@ fn answer(mut state: Vec<usize>, count: usize, query: usize) -> Vec<usize> {
         if len >= count + query {
             break;
         }
-
-        //println!("iter={} fst={} snd={} state={:?}", iter, fst, snd, state);
-        iter += 1;
     }
 
     let mut result = vec![];
-    for i in count..(count + query) {
-        result.push(state[i]);
+    for item in state.iter().skip(count).take(query) {
+        result.push(*item);
     }
     result
 }
 
-fn checksum(items: &Vec<usize>, offset: usize, length: usize) -> usize {
+fn checksum(items: &[usize], offset: usize, length: usize) -> usize {
     if items.len() < offset + length {
         0
     } else {
         let mut acc = 0;
-        for i in offset..(offset + length) {
-            let val = acc * 10 + items[i];
+        for item in items.iter().skip(offset).take(length) {
+            let val = acc * 10 + item;
             acc = val;
         }
         acc
@@ -69,7 +64,6 @@ fn reverse(mut state: Vec<usize>, mask: Vec<usize>) -> usize {
     let mut snd = 1;
     let mut len = state.len();
 
-    let mut iter = 0;
     'outer: loop {
         let one = state[fst];
         let two = state[snd];
@@ -89,9 +83,6 @@ fn reverse(mut state: Vec<usize>, mask: Vec<usize>) -> usize {
 
         fst = (fst + one + 1) % len;
         snd = (snd + two + 1) % len;
-
-        //println!("iter={} fst={} snd={} state={:?} sum={}", iter, fst, snd, state, sum);
-        iter += 1;
     }
 
     //println!("state={:?} sum={}", state, sum);
@@ -99,7 +90,7 @@ fn reverse(mut state: Vec<usize>, mask: Vec<usize>) -> usize {
 }
 
 pub fn main() {
-    let count: usize = 030121; // input
+    let count: usize = 0o030121; // input
     let query: usize = 10; // 10 recepies after 'count' of recepies is available
 
     let state: Vec<usize> = vec![3, 7];

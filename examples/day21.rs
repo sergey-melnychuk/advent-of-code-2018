@@ -105,12 +105,12 @@ impl Code {
             "bori" => state.set(c, s.get(a) | b),
             "setr" => state.set(c, s.get(a)),
             "seti" => state.set(c, a),
-            "gtrr" => state.set(c, if s.get(a) > s.get(b) { 1 } else { 0 }),
-            "gtri" => state.set(c, if s.get(a) > b { 1 } else { 0 }),
-            "gtir" => state.set(c, if a > s.get(b) { 1 } else { 0 }),
-            "eqrr" => state.set(c, if s.get(a) == s.get(b) { 1 } else { 0 }),
-            "eqri" => state.set(c, if s.get(a) == b { 1 } else { 0 }),
-            "eqir" => state.set(c, if a == s.get(b) { 1 } else { 0 }),
+            "gtrr" => state.set(c, usize::from(s.get(a) > s.get(b))),
+            "gtri" => state.set(c, usize::from(s.get(a) > b)),
+            "gtir" => state.set(c, usize::from(a > s.get(b))),
+            "eqrr" => state.set(c, usize::from(s.get(a) == s.get(b))),
+            "eqri" => state.set(c, usize::from(s.get(a) == b)),
+            "eqir" => state.set(c, usize::from(a == s.get(b))),
             _ => (),
         }
     }
@@ -123,13 +123,7 @@ fn process(codes: &[Code], mut state: State) -> State {
 
     let mut min1 = usize::MAX;
     let mut last = usize::MAX;
-    let mut n: usize = 0;
     while at < codes.len() {
-        n += 1;
-        if n >= usize::MAX {
-            break;
-        }
-
         let op = &codes[at];
         //println!("at={} op={:?} st={:?}", at, op, st);
 

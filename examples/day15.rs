@@ -153,6 +153,7 @@ impl Grid {
                     } else {
                         //println!("found(n) at={:?} to={:?} cto={} cat={}", at, to, cost_to, cost_at);
                         //println!("\tidx={} c={} f={:?}", index, cost, finish);
+                        #[allow(clippy::comparison_chain)]
                         if cost > cost_at + 1 {
                             //println!("\tbetter cost");
                             from.insert(to, at);
@@ -182,11 +183,8 @@ impl Grid {
             }
         }
 
-        if finish.is_none() {
-            vec![] // no path found
-        } else {
+        if let Some(mut parent) = finish {
             // Unwind the path
-            let mut parent = finish.unwrap();
             let mut result = Vec::new();
             result.push(parent);
             loop {
@@ -200,6 +198,8 @@ impl Grid {
             }
             result.reverse();
             result
+        } else {
+            vec![] // no path found
         }
     }
 
@@ -228,32 +228,6 @@ impl Grid {
 
         found
     }
-
-    fn dump(&self) -> Vec<String> {
-        let mut chars: Vec<Vec<char>> = vec![vec!['x'; self.cols]; self.rows];
-        for r in 0..self.rows {
-            for c in 0..self.cols {
-                chars[r][c] = self.cells[r][c];
-            }
-        }
-
-        for (r, row) in self.units.iter().enumerate() {
-            for (c, opt) in row.iter().enumerate() {
-                if opt.is_some() {
-                    let u = opt.unwrap();
-                    chars[r][c] = u.kind;
-                    let mut val = format!(" {}/{}", u.kind, u.health)
-                        .chars()
-                        .into_iter()
-                        .collect();
-                    chars[r].append(&mut val);
-                    //println!("\tdump: add unit at r={} c={} {}/{}", r, c, u.kind, u.health);
-                }
-            }
-        }
-
-        chars.into_iter().map(|cs| cs.iter().collect()).collect()
-    }
 }
 
 fn get_input() -> Vec<String> {
@@ -271,15 +245,12 @@ fn simulation(grid: &mut Grid) -> (usize, usize) {
                 continue;
             }
             let opt = grid.units[r][c];
-            if opt.is_some() {
-                let u = opt.unwrap();
+            if let Some(u) = opt {
                 let kind = if u.kind == 'E' { 'G' } else { 'E' };
                 let op = grid.target(p, kind);
-                if op.is_some() {
-                    let t = op.unwrap();
-                    if grid.units[t.row][t.col].is_some() {
+                if let Some(t) = op {
+                    if let Some(that) = grid.units[t.row][t.col] {
                         // attack
-                        let that = grid.units[t.row][t.col].unwrap();
                         let after = u.attack(that);
                         grid.units[t.row][t.col] = after;
                         if after.is_none() {
@@ -297,10 +268,8 @@ fn simulation(grid: &mut Grid) -> (usize, usize) {
                         //println!("move: {}/{} {:?} -> {:?}", u.kind, u.health, p, t);
 
                         let to = grid.target(t, kind);
-                        if to.is_some() {
-                            let p = to.unwrap();
-                            if grid.units[p.row][p.col].is_some() {
-                                let that = grid.units[p.row][p.col].unwrap();
+                        if let Some(p) = to {
+                            if let Some(that) = grid.units[p.row][p.col] {
                                 let after = u.attack(that);
                                 grid.units[p.row][p.col] = after;
                                 if after.is_none() {

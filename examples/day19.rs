@@ -59,12 +59,12 @@ impl Instruction for Code {
             "bori" => state.set(c, s.get(a) | b),
             "setr" => state.set(c, s.get(a)),
             "seti" => state.set(c, a),
-            "gtrr" => state.set(c, if s.get(a) > s.get(b) { 1 } else { 0 }),
-            "gtri" => state.set(c, if s.get(a) > b { 1 } else { 0 }),
-            "gtir" => state.set(c, if a > s.get(b) { 1 } else { 0 }),
-            "eqrr" => state.set(c, if s.get(a) == s.get(b) { 1 } else { 0 }),
-            "eqri" => state.set(c, if s.get(a) == b { 1 } else { 0 }),
-            "eqir" => state.set(c, if a == s.get(b) { 1 } else { 0 }),
+            "gtrr" => state.set(c, usize::from(s.get(a) > s.get(b))),
+            "gtri" => state.set(c, usize::from(s.get(a) > b)),
+            "gtir" => state.set(c, usize::from(a > s.get(b))),
+            "eqrr" => state.set(c, usize::from(s.get(a) == s.get(b))),
+            "eqri" => state.set(c, usize::from(s.get(a) == b)),
+            "eqir" => state.set(c, usize::from(a == s.get(b))),
             _ => (),
         }
         self.op != "#op"
@@ -75,7 +75,6 @@ fn process(codes: Vec<Code>, state: State) -> State {
     let mut at: usize = 0;
     let mut st = state;
 
-    let mut it: usize = 0;
     while at < codes.len() {
         let op = codes.get(at).unwrap();
         //println!("at={} op={:?} st={:?}", at, op, st);
@@ -83,8 +82,6 @@ fn process(codes: Vec<Code>, state: State) -> State {
         let ip = st.ip;
         let to = st.inc(ip);
         at = to;
-
-        it += 1;
     }
     //println!("it={} done", it);
 

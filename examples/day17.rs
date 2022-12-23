@@ -12,12 +12,6 @@ struct Pos {
     y: usize,
 }
 
-impl Pos {
-    fn pos(x: usize, y: usize) -> Pos {
-        Pos { x, y }
-    }
-}
-
 #[derive(Eq, PartialEq, Debug)]
 struct Line {
     a: Pos,
@@ -46,18 +40,12 @@ impl Grid {
         Pos { x: minx, y: miny }
     }
 
-    fn dump(&self) -> Vec<String> {
-        let chars = self.chars.clone();
-        chars.into_iter().map(|cs| cs.iter().collect()).collect()
-    }
-
     fn dump_with_offset(&self, x: usize, y: usize) -> Vec<String> {
         let mut chars = vec![vec!['.'; self.cols - x]; self.rows - y];
 
-        for r in 0..chars.len() {
-            let n = chars[r].len();
-            for c in 0..n {
-                chars[r][c] = self.get(c + x, r + y);
+        for (r, row) in chars.iter_mut().enumerate() {
+            for (c, col) in row.iter_mut().enumerate() {
+                *col = self.get(c + x, r + y);
             }
         }
 
@@ -150,8 +138,8 @@ fn build_grid(lines: Vec<Line>) -> Grid {
         if line.a.x == line.b.x {
             // vertical
             let x = line.a.x;
-            for y in line.a.y..=line.b.y {
-                chars[y][x] = '#';
+            for row in chars.iter_mut().take(line.b.y + 1).skip(line.a.y) {
+                row[x] = '#';
             }
         } else {
             // horizontal
@@ -172,7 +160,6 @@ fn build_grid(lines: Vec<Line>) -> Grid {
 fn get_hbounds(pos: &Pos, grid: &Grid) -> (usize, usize, char) {
     let mut lborder: usize = 0;
     let mut rborder: usize = grid.cols - 1;
-    let mut chr: char = '~';
     let mut spill = false;
 
     for x in (0..pos.x).rev() {
@@ -203,11 +190,7 @@ fn get_hbounds(pos: &Pos, grid: &Grid) -> (usize, usize, char) {
         }
     }
 
-    if spill {
-        chr = '|';
-    } else {
-        chr = '~';
-    }
+    let chr = if spill { '|' } else { '~' };
     (lborder, rborder, chr)
 }
 
@@ -247,9 +230,8 @@ fn get_sources(pos: &Pos, l: usize, r: usize, grid: &Grid) -> Vec<Pos> {
         let c = grid.get(x, y - 1);
         if c == '|' {
             let p = Pos { y: y - 1, ..*pos };
-            let opt = get_ubound(&p, grid);
-            if opt.is_some() {
-                result.push(opt.unwrap());
+            if let Some(x) = get_ubound(&p, grid) {
+                result.push(x);
             }
         }
     }
@@ -259,9 +241,7 @@ fn get_sources(pos: &Pos, l: usize, r: usize, grid: &Grid) -> Vec<Pos> {
 fn pour(from: &Pos, grid: &mut Grid) -> Vec<Pos> {
     let mut result = Vec::new();
 
-    let opt = get_lbound(from, grid);
-    if opt.is_some() {
-        let p = opt.unwrap();
+    if let Some(p) = get_lbound(from, grid) {
         let (l, r, c) = get_hbounds(&p, grid);
         //println!("from={:?} pos={:?} l={} r={} c={}", from, p, l, r, c);
         if *from == p && c == '~' {

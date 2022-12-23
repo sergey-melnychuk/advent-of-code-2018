@@ -84,7 +84,7 @@ fn fetch_input() -> Vec<Star> {
     result
 }
 
-fn move_stars(stars: &Vec<Star>, seconds: isize) -> (Vec<(i64, i64)>, Size) {
+fn move_stars(stars: &[Star], seconds: isize) -> (Vec<(i64, i64)>, Size) {
     let (mut xmin, mut xmax, mut ymin, mut ymax) =
         (std::i64::MAX, std::i64::MIN, std::i64::MAX, std::i64::MIN);
     let mut result = Vec::new();
